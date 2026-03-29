@@ -9,7 +9,6 @@ import json
 import logging
 import os
 import re
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
@@ -25,54 +24,9 @@ INVALID_API_KEY_VALUES = {
 }
 
 try:
-    from dotenv import load_dotenv
-
-    env_file = Path.cwd() / ".env"
-    if env_file.exists():
-        load_dotenv(env_file)
-except ImportError:
-    pass
-
-try:
     from google import generativeai as genai
 except ImportError:
     genai = None
-
-
-def _get_all_api_keys() -> List[str]:
-    keys: List[str] = []
-    try:
-        import streamlit as st
-
-        for i in range(1, 5):
-            key = st.secrets.get(f"GEMINI_API_KEY_{i}")
-            if key:
-                keys.append(key)
-    except Exception:
-        pass
-
-    env_key = os.getenv("GEMINI_API_KEY")
-    if env_key:
-        keys.append(env_key)
-
-    for i in range(1, 5):
-        env_key_i = os.getenv(f"GEMINI_API_KEY_{i}")
-        if env_key_i:
-            keys.append(env_key_i)
-
-    filtered_keys = []
-    for key in keys:
-        normalized = key.strip()
-        if normalized.lower() in INVALID_API_KEY_VALUES:
-            continue
-        filtered_keys.append(normalized)
-
-    return list(dict.fromkeys(filtered_keys))
-
-
-def _get_first_api_key() -> Optional[str]:
-    keys = _get_all_api_keys()
-    return keys[0] if keys else None
 
 
 def _clean_json_text(text: str) -> str:
@@ -92,9 +46,13 @@ def _extract_json_candidates(text: str) -> List[str]:
     return list(dict.fromkeys(candidate for candidate in candidates if candidate))
 
 
-def _is_mock_enabled() -> bool:
-    value = os.getenv("AETHERFIT_USE_MOCK_LLM", "").strip().lower()
-    return value in {"1", "true", "yes", "on"}
+def _normalize_api_key(api_key: Optional[str]) -> Optional[str]:
+    if api_key is None:
+        return None
+    normalized = api_key.strip()
+    if not normalized or normalized.lower() in INVALID_API_KEY_VALUES:
+        return None
+    return normalized
 
 
 def _mock_payload_for_prompt(prompt: str) -> Dict[str, Any]:
@@ -121,6 +79,7 @@ def _mock_payload_for_prompt(prompt: str) -> Dict[str, Any]:
         }
     if "nutrition" in prompt_lower:
         return {
+            "maintenance_calories": 2200,
             "daily_calorie_target": 2200,
             "macro_targets": {"protein_g": 150, "carbs_g": 230, "fat_g": 65},
             "meal_suggestions": [
@@ -221,42 +180,38 @@ class MockGeminiClient:
         return result
 
 
-def build_gemini_client():
-    if _is_mock_enabled():
+def build_gemini_client(
+    api_key: Optional[str] = None,
+    use_mock: bool = False,
+    model_name: Optional[str] = None,
+):
+    if use_mock:
         logger.info("Using mock Gemini client")
         return MockGeminiClient()
 
-    api_key = _get_first_api_key()
-    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
-    if not api_key:
-        raise ValueError("Gemini API key not found. Set GEMINI_API_KEY or GEMINI_API_KEY_1..4 in .env")
+    normalized_api_key = _normalize_api_key(api_key)
+    selected_model = model_name or os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+    if not normalized_api_key:
+        raise ValueError("Gemini API key is required for live generation.")
     if genai is None:
         raise ImportError("google-generativeai is not installed. Install with: pip install google-generativeai")
 
-    genai.configure(api_key=api_key)
-    return GeminiClient(model=model_name)
+    genai.configure(api_key=normalized_api_key)
+    return GeminiClient(api_key=normalized_api_key, model=selected_model)
 
 
 class GeminiClient:
-    def __init__(self, model: str = "gemini-2.5-flash-lite"):
+    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite"):
+        self.api_key = api_key
         self.model = model
-        self.api_keys = _get_all_api_keys()
-        self.current_key_index = 0
         self.client = None
         self._initialize_client()
 
     def _initialize_client(self) -> None:
-        if not self.api_keys:
-            raise ValueError("No valid API keys available for Gemini")
-        genai.configure(api_key=self.api_keys[self.current_key_index])
+        if not self.api_key:
+            raise ValueError("No valid Gemini API key available")
+        genai.configure(api_key=self.api_key)
         self.client = genai.GenerativeModel(self.model)
-
-    def _rotate_api_key(self) -> bool:
-        self.current_key_index += 1
-        if self.current_key_index >= len(self.api_keys):
-            return False
-        self._initialize_client()
-        return True
 
     def generate_content(
         self,
@@ -272,19 +227,13 @@ class GeminiClient:
         if response_mime_type:
             generation_config["response_mime_type"] = response_mime_type
 
-        for attempt in range(len(self.api_keys)):
-            try:
-                response = self.client.generate_content(prompt, generation_config=generation_config)
-                if not response or not getattr(response, "text", None):
-                    raise ValueError("Empty response from LLM")
-                return response.text
-            except Exception as exc:
-                error_text = str(exc).lower()
-                is_quota_error = any(token in error_text for token in ["429", "quota", "rate limit", "exceeded"])
-                if is_quota_error and attempt < len(self.api_keys) - 1 and self._rotate_api_key():
-                    continue
-                raise ValueError(f"Failed to generate content from LLM: {exc}") from exc
-        raise ValueError("Failed after exhausting all available API keys")
+        try:
+            response = self.client.generate_content(prompt, generation_config=generation_config)
+            if not response or not getattr(response, "text", None):
+                raise ValueError("Empty response from LLM")
+            return response.text
+        except Exception as exc:
+            raise ValueError(f"Failed to generate content from LLM: {exc}") from exc
 
     def extract_json_from_response(self, response_text: str) -> Dict[str, Any]:
         return extract_json(response_text)

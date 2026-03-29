@@ -31,7 +31,7 @@ class InputNormalizerLLMAgent:
 
         {{
           "normalized_fitness_experience": {{
-            "experience_level": "beginner | intermediate | advanced",
+            "experience_level": "Never Exercised | Beginner | Some Experience | Advanced",
             "years_active": int,
             "activity_description": string
           }},
@@ -48,6 +48,14 @@ class InputNormalizerLLMAgent:
             "schedule_constraints": [string]
           }}
         }}
+
+        Rules for fitness_experience normalization:
+        - Prefer actual years of consistent training over a stray self-description.
+        - Map 0 years or no training history to "Never Exercised".
+        - Map less than 1 year of training to "Beginner".
+        - Map 1 to 4 years of consistent training to "Some Experience".
+        - Map 5 or more years of consistent training to "Advanced".
+        - If the input is mixed, keep the category that best matches the training history and mention nuance in activity_description.
         """
 
         required_fields = [

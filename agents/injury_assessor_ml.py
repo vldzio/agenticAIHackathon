@@ -27,6 +27,29 @@ class InjuryAssessorMLAgent:
         self.feature_encoders = self.encoder_data["feature_encoders"]
         self.label_encoder = self.encoder_data["target_encoder"]
 
+    def _normalize_experience_label(self, raw_value: Any, years_active: Any) -> str:
+        years = 0.0
+        try:
+            if years_active is not None:
+                years = max(float(years_active), 0.0)
+        except (TypeError, ValueError):
+            years = 0.0
+
+        normalized = str(raw_value or "").strip().lower()
+        if years >= 5:
+            return "Advanced"
+        if years >= 1:
+            return "Some Experience"
+        if normalized in {"advanced", "athlete"}:
+            return "Advanced"
+        if normalized in {"intermediate", "some experience"}:
+            return "Some Experience"
+        if normalized in {"never exercised", "none", "no experience"}:
+            return "Never Exercised"
+        if normalized == "beginner":
+            return "Beginner"
+        return "Beginner" if years > 0 else "Never Exercised"
+
     def _age_category(self, age: int) -> str:
         if age < 30:
             return "Young Adult"
@@ -90,7 +113,10 @@ class InjuryAssessorMLAgent:
         age = int(user_profile.get("age", 43))
         bmi = float(user_profile.get("bmi", 22))
         gender = user_profile.get("gender", "Male")
-        experience = user_profile.get("fitness_experience_level") or user_profile.get("fitness_experience") or "Beginner"
+        experience = self._normalize_experience_label(
+            user_profile.get("fitness_experience_level") or user_profile.get("fitness_experience"),
+            user_profile.get("fitness_years_active"),
+        )
         fitness_level = user_profile.get("fitness_level_class", "Beginner")
         hours = float(user_profile.get("available_hours_per_week", 3))
         health_conditions = str(user_profile.get("health_conditions", "") or "")

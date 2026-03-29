@@ -9,6 +9,7 @@ class FitnessScorerMLAgent:
     """Classifies fitness level using the trained RandomForest model."""
 
     CLASS_NAMES = ["Beginner", "Intermediate", "Advanced", "Athlete"]
+    EXPERIENCE_LABELS = {"Never Exercised", "Beginner", "Some Experience", "Advanced"}
 
     def __init__(self, model_dir: str = "ml/models"):
         base_dir = Path(__file__).resolve().parent.parent
@@ -34,9 +35,35 @@ class FitnessScorerMLAgent:
             return "High"
         return "Athletic"
 
+    def _normalize_experience_label(self, raw_value: Any, years_active: Any) -> str:
+        years = 0.0
+        try:
+            if years_active is not None:
+                years = max(float(years_active), 0.0)
+        except (TypeError, ValueError):
+            years = 0.0
+
+        normalized = str(raw_value or "").strip().lower()
+        if years >= 5:
+            return "Advanced"
+        if years >= 1:
+            return "Some Experience"
+        if normalized in {"advanced", "athlete"}:
+            return "Advanced"
+        if normalized in {"intermediate", "some experience"}:
+            return "Some Experience"
+        if normalized in {"never exercised", "none", "no experience"}:
+            return "Never Exercised"
+        if normalized == "beginner":
+            return "Beginner"
+        return "Beginner" if years > 0 else "Never Exercised"
+
     def predict_fitness_level(self, user_profile: Dict[str, Any]) -> Dict[str, Any]:
         available_hours = float(user_profile.get("available_hours_per_week", 3))
-        experience_level = user_profile.get("fitness_experience_level") or user_profile.get("fitness_experience") or "Beginner"
+        experience_level = self._normalize_experience_label(
+            user_profile.get("fitness_experience_level") or user_profile.get("fitness_experience"),
+            user_profile.get("fitness_years_active"),
+        )
 
         features = {
             "Age": int(user_profile["age"]),
@@ -58,7 +85,10 @@ class FitnessScorerMLAgent:
             if col in self.encoder["feature_encoders"]:
                 encoder = self.encoder["feature_encoders"][col]
                 if value not in encoder.classes_:
-                    value = encoder.classes_[0]
+                    if col == "Fitness_Experience":
+                        value = "Some Experience" if "Some Experience" in encoder.classes_ else encoder.classes_[0]
+                    else:
+                        value = encoder.classes_[0]
                 value = encoder.transform([value])[0]
             encoded_values.append(value)
 

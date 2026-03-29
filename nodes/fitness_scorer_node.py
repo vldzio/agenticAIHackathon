@@ -20,8 +20,11 @@ def fitness_scorer_node(state: FitnessAssessmentState, client=None) -> Dict[str,
             }
         )
         experience_level = state.get("normalized_fitness_experience", {}).get("experience_level")
+        years_active = state.get("normalized_fitness_experience", {}).get("years_active")
         if experience_level:
-            user_profile["fitness_experience_level"] = experience_level.title()
+            user_profile["fitness_experience_level"] = experience_level
+        if years_active is not None:
+            user_profile["fitness_years_active"] = years_active
         estimated_hours = state.get("normalized_schedule", {}).get("estimated_hours_per_week")
         user_profile["available_hours_per_week"] = estimated_hours if estimated_hours is not None else 3
 

@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime, timezone
 
 import streamlit as st
@@ -16,16 +15,44 @@ def initialize_session_state():
         st.session_state.client = None
     if "eval_results" not in st.session_state:
         st.session_state.eval_results = None
+    if "generation_mode" not in st.session_state:
+        st.session_state.generation_mode = "Mock Demo"
+    if "user_gemini_api_key" not in st.session_state:
+        st.session_state.user_gemini_api_key = ""
+    if "client_signature" not in st.session_state:
+        st.session_state.client_signature = None
 
 
 def setup_api_client():
     try:
-        if st.session_state.client is None:
-            st.session_state.client = build_gemini_client()
+        mode = st.session_state.generation_mode
+        use_mock = mode == "Mock Demo"
+        api_key = st.session_state.user_gemini_api_key.strip()
+        client_signature = ("mock", None) if use_mock else ("byok", api_key)
+
+        if not use_mock and not api_key:
+            st.error("Enter your Gemini API key to use live generation.")
+            return False
+
+        if st.session_state.client is None or st.session_state.client_signature != client_signature:
+            st.session_state.client = build_gemini_client(api_key=api_key, use_mock=use_mock)
+            st.session_state.client_signature = client_signature
         return True
     except Exception as exc:
+        st.session_state.client = None
+        st.session_state.client_signature = None
         st.error(f"Client setup error: {exc}")
         return False
+
+
+def reset_runtime_client():
+    st.session_state.client = None
+    st.session_state.client_signature = None
+
+
+def clear_api_key():
+    st.session_state.user_gemini_api_key = ""
+    reset_runtime_client()
 
 
 def display_overview_tab(assessment):
@@ -149,11 +176,34 @@ def main():
 
     st.title("AetherFit AI")
     st.write("Personalized Fitness Assessment System")
-    if os.getenv("AETHERFIT_USE_MOCK_LLM", "").strip().lower() in {"1", "true", "yes", "on"}:
-        st.warning("Mock LLM mode is enabled. Workout, nutrition, and recovery content is simulated.")
+    if st.session_state.generation_mode == "Mock Demo":
+        st.warning("Mock Demo is active. Results are simulated and no API key is required.")
 
     with st.sidebar:
         st.header("User Input")
+        previous_mode = st.session_state.generation_mode
+        previous_api_key = st.session_state.user_gemini_api_key
+        generation_mode = st.radio(
+            "Generation Mode",
+            ["Mock Demo", "Use My Gemini API Key"],
+            key="generation_mode",
+        )
+        if generation_mode == "Use My Gemini API Key":
+            st.text_input(
+                "Gemini API Key",
+                type="password",
+                key="user_gemini_api_key",
+                help="Used only for this session and not stored.",
+            )
+            st.caption("Your API key is used only for this session and is not stored.")
+            st.button("Clear API Key", on_click=clear_api_key)
+
+        if (
+            st.session_state.generation_mode != previous_mode
+            or st.session_state.user_gemini_api_key != previous_api_key
+        ):
+            reset_runtime_client()
+
         name = st.text_input("Name", value="Alex")
         age = st.slider("Age", 18, 100, 30)
         height = st.number_input("Height (cm)", min_value=100, max_value=250, value=170)
