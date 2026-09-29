@@ -14,6 +14,8 @@ RUN pip install -r requirements.txt
 # Application code, trained model artifacts and the small evaluation set (used by /models/evaluation).
 # Training data is deliberately excluded (see .dockerignore); retrain with `make train`.
 COPY app ./app
+# ml_pipeline is imported by the live evaluation endpoint (shared cleaning code)
+COPY ml_pipeline ./ml_pipeline
 COPY scripts ./scripts
 COPY artifacts ./artifacts
 COPY data/evaluation_dataset ./data/evaluation_dataset

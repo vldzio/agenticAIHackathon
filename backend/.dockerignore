@@ -10,6 +10,5 @@ var
 tests
 data/training_dataset
 data/processed
-ml_pipeline
 Dockerfile
 .dockerignore
