@@ -1,5 +1,17 @@
 # AetherFit AI — Plan to a Fully Functional Application
 
+> ## Status (implemented on branch `arena/01a0ee3a-agenticaihackathon`)
+>
+> Phases 0–5 have been implemented. What changed relative to this plan:
+> - **Frontend styling:** plain CSS instead of Tailwind (fewer dependencies; the UI is small).
+> - **Identity:** plans are scoped by an anonymous `X-Device-Id`; real accounts are still open.
+> - **Retrained models are honest, not 98 %:** fitness 79.2 %, injury 69.2 % on the held-out CSVs (see `docs/MODEL_CARD.md`).
+> - **Not done / not verified:** Docker images were never built (no daemon in the authoring sandbox); the live Gemini path is tested with fakes only; nothing is deployed; no DB migrations; rate limiter is in-process.
+> - Streamlit (`main.py`) was removed. See `README.md` for the new layout and commands.
+>
+> The text below is the original plan and review, kept for reference.
+
+
 _Based on a code review plus a hands-on run of the repo (fresh venv, Mock mode, Streamlit AppTest, model evaluation, and the training pipeline in a scratch copy)._
 
 ## 1. Where the project stands

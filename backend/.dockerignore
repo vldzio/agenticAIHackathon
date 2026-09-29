@@ -1,0 +1,15 @@
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+var
+tests
+data/training_dataset
+data/processed
+ml_pipeline
+Dockerfile
+.dockerignore

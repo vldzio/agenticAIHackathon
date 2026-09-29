@@ -1,0 +1,27 @@
+# Production-like stack:  docker compose up --build   →   http://localhost:8080
+services:
+  backend:
+    build: ./backend
+    environment:
+      AETHERFIT_ENV: prod
+      AETHERFIT_DATABASE_URL: sqlite:////data/aetherfit.db
+      AETHERFIT_CORS_ORIGINS: http://localhost:8080
+      AETHERFIT_TRUST_PROXY_HEADERS: "true"   # requests arrive via the nginx container
+      AETHERFIT_LOG_LEVEL: INFO
+    volumes:
+      - aetherfit-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  aetherfit-data:
