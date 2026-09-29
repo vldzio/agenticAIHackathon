@@ -1,0 +1,38 @@
+[project]
+name = "aetherfit-backend"
+version = "1.0.0"
+description = "AetherFit AI API"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -m 'not live' -p no:cacheprovider"
+markers = ["live: hits the real Gemini API (needs GEMINI_API_KEY); skipped by default"]
+filterwarnings = ["error::DeprecationWarning:app", "error::UserWarning"]
+
+[tool.coverage.run]
+source = ["app", "ml_pipeline"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+extend-exclude = ["artifacts", "data", "var"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501", "B008", "RUF012", "SIM108", "RUF005", "RUF007"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "RUF001"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = false
+plugins = ["pydantic.mypy"]
+exclude = ["tests/", "data/", "artifacts/"]

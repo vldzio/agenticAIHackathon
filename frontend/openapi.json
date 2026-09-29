@@ -1,0 +1,3112 @@
+{
+  "components": {
+    "schemas": {
+      "Assessment": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "errors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/NodeError"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "fitness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FitnessResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "injury": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InjuryResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Metrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "enum": [
+              "mock",
+              "live"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "normalized": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NormalizedInputs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nutrition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NutritionPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/ProfileIn"
+          },
+          "progress_context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProgressContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recovery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecoveryPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "safety": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SafetyResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sections": {
+            "additionalProperties": {
+              "enum": [
+                "ok",
+                "partial",
+                "failed",
+                "skipped"
+              ],
+              "type": "string"
+            },
+            "default": {},
+            "title": "Sections",
+            "type": "object"
+          },
+          "simulated": {
+            "description": "True when produced by the mock generator rather than a live model",
+            "title": "Simulated",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "partial",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          },
+          "workout": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkoutPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "mode",
+          "simulated",
+          "status",
+          "profile"
+        ],
+        "title": "Assessment",
+        "type": "object"
+      },
+      "AssessmentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "default": "mock",
+            "enum": [
+              "mock",
+              "live"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/ProfileIn"
+          }
+        },
+        "required": [
+          "profile"
+        ],
+        "title": "AssessmentRequest",
+        "type": "object"
+      },
+      "AssessmentSummary": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "daily_calorie_target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Calorie Target"
+          },
+          "fitness_goal": {
+            "title": "Fitness Goal",
+            "type": "string"
+          },
+          "fitness_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fitness Level"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "injury_risk": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Injury Risk"
+          },
+          "mode": {
+            "enum": [
+              "mock",
+              "live"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "safety_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Safety Level"
+          },
+          "sessions_per_week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sessions Per Week"
+          },
+          "simulated": {
+            "title": "Simulated",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "partial",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "parent_id",
+          "mode",
+          "simulated",
+          "status",
+          "user_name",
+          "fitness_goal",
+          "fitness_level",
+          "injury_risk",
+          "safety_level",
+          "daily_calorie_target",
+          "sessions_per_week"
+        ],
+        "title": "AssessmentSummary",
+        "type": "object"
+      },
+      "Driver": {
+        "properties": {
+          "effect_pct_points": {
+            "description": "Change in the predicted class's probability vs a baseline profile",
+            "title": "Effect Pct Points",
+            "type": "number"
+          },
+          "feature": {
+            "title": "Feature",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "feature",
+          "value",
+          "effect_pct_points"
+        ],
+        "title": "Driver",
+        "type": "object"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "field_errors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FieldError"
+            },
+            "title": "Field Errors",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Exercise": {
+        "properties": {
+          "exercise_name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Exercise Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "reps": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Reps",
+            "type": "string"
+          },
+          "rest_period": {
+            "default": "60 sec",
+            "title": "Rest Period",
+            "type": "string"
+          },
+          "sets": {
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Sets",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "exercise_name",
+          "sets",
+          "reps"
+        ],
+        "title": "Exercise",
+        "type": "object"
+      },
+      "FieldError": {
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "message"
+        ],
+        "title": "FieldError",
+        "type": "object"
+      },
+      "FitnessResult": {
+        "properties": {
+          "confidence": {
+            "description": "Probability of the predicted class, in percent (0-100).",
+            "title": "Confidence",
+            "type": "number"
+          },
+          "drivers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Driver"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "notes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Probability of each class as a fraction (0-1); they sum to 1.",
+            "title": "Probabilities",
+            "type": "object"
+          }
+        },
+        "required": [
+          "level",
+          "confidence",
+          "probabilities"
+        ],
+        "title": "FitnessResult",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "database": {
+            "title": "Database",
+            "type": "boolean"
+          },
+          "models_loaded": {
+            "title": "Models Loaded",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version",
+          "database",
+          "models_loaded"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "InjuryResult": {
+        "properties": {
+          "confidence": {
+            "description": "Probability of the predicted class, in percent (0-100).",
+            "title": "Confidence",
+            "type": "number"
+          },
+          "drivers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Driver"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "notes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Probability of each class as a fraction (0-1); they sum to 1.",
+            "title": "Probabilities",
+            "type": "object"
+          },
+          "risk": {
+            "title": "Risk",
+            "type": "string"
+          },
+          "risk_factors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Risk Factors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "risk",
+          "confidence",
+          "probabilities"
+        ],
+        "title": "InjuryResult",
+        "type": "object"
+      },
+      "MacroTargets": {
+        "properties": {
+          "carbs_g": {
+            "title": "Carbs G",
+            "type": "integer"
+          },
+          "fat_g": {
+            "title": "Fat G",
+            "type": "integer"
+          },
+          "protein_g": {
+            "title": "Protein G",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "protein_g",
+          "carbs_g",
+          "fat_g"
+        ],
+        "title": "MacroTargets",
+        "type": "object"
+      },
+      "Meal": {
+        "properties": {
+          "calories": {
+            "maximum": 3000.0,
+            "minimum": 0.0,
+            "title": "Calories",
+            "type": "number"
+          },
+          "carbs_g": {
+            "maximum": 600.0,
+            "minimum": 0.0,
+            "title": "Carbs G",
+            "type": "number"
+          },
+          "fat_g": {
+            "maximum": 300.0,
+            "minimum": 0.0,
+            "title": "Fat G",
+            "type": "number"
+          },
+          "foods": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Foods",
+            "type": "array"
+          },
+          "meal_name": {
+            "title": "Meal Name",
+            "type": "string"
+          },
+          "protein_g": {
+            "maximum": 300.0,
+            "minimum": 0.0,
+            "title": "Protein G",
+            "type": "number"
+          }
+        },
+        "required": [
+          "meal_name",
+          "foods",
+          "protein_g",
+          "carbs_g",
+          "fat_g",
+          "calories"
+        ],
+        "title": "Meal",
+        "type": "object"
+      },
+      "Metrics": {
+        "properties": {
+          "age_category": {
+            "title": "Age Category",
+            "type": "string"
+          },
+          "bmi": {
+            "title": "Bmi",
+            "type": "number"
+          },
+          "bmi_category": {
+            "title": "Bmi Category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bmi",
+          "bmi_category",
+          "age_category"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
+      "NodeError": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          },
+          "retryable": {
+            "default": false,
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "node",
+          "code",
+          "message"
+        ],
+        "title": "NodeError",
+        "type": "object"
+      },
+      "NormalizedExperience": {
+        "properties": {
+          "activity_description": {
+            "default": "",
+            "title": "Activity Description",
+            "type": "string"
+          },
+          "experience_level": {
+            "enum": [
+              "Never Exercised",
+              "Beginner",
+              "Some Experience",
+              "Advanced"
+            ],
+            "title": "Experience Level",
+            "type": "string"
+          },
+          "years_active": {
+            "maximum": 80.0,
+            "minimum": 0.0,
+            "title": "Years Active",
+            "type": "number"
+          }
+        },
+        "required": [
+          "experience_level",
+          "years_active"
+        ],
+        "title": "NormalizedExperience",
+        "type": "object"
+      },
+      "NormalizedHealth": {
+        "properties": {
+          "cleared_for_exercise": {
+            "default": true,
+            "title": "Cleared For Exercise",
+            "type": "boolean"
+          },
+          "conditions": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 15,
+            "title": "Conditions",
+            "type": "array"
+          },
+          "exercise_limitations": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 15,
+            "title": "Exercise Limitations",
+            "type": "array"
+          },
+          "severity_assessment": {
+            "default": "none",
+            "enum": [
+              "none",
+              "mild",
+              "moderate",
+              "severe"
+            ],
+            "title": "Severity Assessment",
+            "type": "string"
+          }
+        },
+        "title": "NormalizedHealth",
+        "type": "object"
+      },
+      "NormalizedInputs": {
+        "properties": {
+          "experience": {
+            "$ref": "#/components/schemas/NormalizedExperience"
+          },
+          "health": {
+            "$ref": "#/components/schemas/NormalizedHealth"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/NormalizedSchedule"
+          }
+        },
+        "required": [
+          "experience",
+          "health",
+          "schedule"
+        ],
+        "title": "NormalizedInputs",
+        "type": "object"
+      },
+      "NormalizedSchedule": {
+        "properties": {
+          "estimated_hours_per_week": {
+            "maximum": 40.0,
+            "minimum": 0.0,
+            "title": "Estimated Hours Per Week",
+            "type": "number"
+          },
+          "preferred_days": {
+            "items": {
+              "enum": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "type": "string"
+            },
+            "title": "Preferred Days",
+            "type": "array"
+          },
+          "preferred_times": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Preferred Times",
+            "type": "array"
+          },
+          "schedule_constraints": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Schedule Constraints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "estimated_hours_per_week"
+        ],
+        "title": "NormalizedSchedule",
+        "type": "object"
+      },
+      "NutritionPlan": {
+        "properties": {
+          "daily_calorie_target": {
+            "title": "Daily Calorie Target",
+            "type": "integer"
+          },
+          "hydration_recommendation": {
+            "default": "",
+            "title": "Hydration Recommendation",
+            "type": "string"
+          },
+          "macro_targets": {
+            "$ref": "#/components/schemas/MacroTargets"
+          },
+          "maintenance_calories": {
+            "title": "Maintenance Calories",
+            "type": "integer"
+          },
+          "meal_suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/Meal"
+            },
+            "title": "Meal Suggestions",
+            "type": "array"
+          },
+          "meal_totals": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Meal Totals",
+            "type": "object"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "nutrition_timing_guidance": {
+            "default": "",
+            "title": "Nutrition Timing Guidance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "maintenance_calories",
+          "daily_calorie_target",
+          "macro_targets"
+        ],
+        "title": "NutritionPlan",
+        "type": "object"
+      },
+      "ProfileIn": {
+        "additionalProperties": false,
+        "description": "User profile as submitted by the frontend. Free-text fields are length-limited and sanitised.",
+        "properties": {
+          "age": {
+            "maximum": 100.0,
+            "minimum": 18.0,
+            "title": "Age",
+            "type": "integer"
+          },
+          "available_hours_per_week": {
+            "description": "Free text, e.g. '4-5 hours, weekday mornings'",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Available Hours Per Week",
+            "type": "string"
+          },
+          "fitness_experience": {
+            "description": "Free text, e.g. '2 years of gym training'",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Fitness Experience",
+            "type": "string"
+          },
+          "fitness_goal": {
+            "enum": [
+              "Weight Loss",
+              "Muscle Building",
+              "Endurance/Cardio",
+              "General Fitness"
+            ],
+            "title": "Fitness Goal",
+            "type": "string"
+          },
+          "gender": {
+            "enum": [
+              "Male",
+              "Female",
+              "Other"
+            ],
+            "title": "Gender",
+            "type": "string"
+          },
+          "health_conditions": {
+            "default": "None",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Health Conditions",
+            "type": "string"
+          },
+          "height_cm": {
+            "maximum": 250.0,
+            "minimum": 100.0,
+            "title": "Height Cm",
+            "type": "number"
+          },
+          "previous_injury": {
+            "default": false,
+            "title": "Previous Injury",
+            "type": "boolean"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          },
+          "weight_kg": {
+            "maximum": 300.0,
+            "minimum": 30.0,
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "age",
+          "height_cm",
+          "weight_kg",
+          "gender",
+          "fitness_goal",
+          "fitness_experience",
+          "available_hours_per_week"
+        ],
+        "title": "ProfileIn",
+        "type": "object"
+      },
+      "ProgressContext": {
+        "properties": {
+          "adherence_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adherence Pct"
+          },
+          "average_rpe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Rpe"
+          },
+          "deload_due": {
+            "default": false,
+            "title": "Deload Due",
+            "type": "boolean"
+          },
+          "latest_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Weight Kg"
+          },
+          "notes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "planned_sessions_per_week": {
+            "default": 0,
+            "title": "Planned Sessions Per Week",
+            "type": "integer"
+          },
+          "sessions_last_28_days": {
+            "default": 0,
+            "title": "Sessions Last 28 Days",
+            "type": "integer"
+          },
+          "weeks_on_plan": {
+            "default": 0,
+            "title": "Weeks On Plan",
+            "type": "number"
+          },
+          "weight_change_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Change Kg"
+          }
+        },
+        "title": "ProgressContext",
+        "type": "object"
+      },
+      "ProgressLogIn": {
+        "additionalProperties": false,
+        "properties": {
+          "completed": {
+            "default": true,
+            "title": "Completed",
+            "type": "boolean"
+          },
+          "duration_minutes": {
+            "anyOf": [
+              {
+                "maximum": 600.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Minutes"
+          },
+          "kind": {
+            "enum": [
+              "session",
+              "weight"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "logged_on": {
+            "format": "date",
+            "title": "Logged On",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "planned_day": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Day"
+          },
+          "rpe": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rate of perceived exertion, 1-10",
+            "title": "Rpe"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "maximum": 300.0,
+                "minimum": 30.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "ProgressLogIn",
+        "type": "object"
+      },
+      "ProgressLogOut": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "completed": {
+            "default": true,
+            "title": "Completed",
+            "type": "boolean"
+          },
+          "duration_minutes": {
+            "anyOf": [
+              {
+                "maximum": 600.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Minutes"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "session",
+              "weight"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "logged_on": {
+            "format": "date",
+            "title": "Logged On",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "planned_day": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Day"
+          },
+          "rpe": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rate of perceived exertion, 1-10",
+            "title": "Rpe"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "maximum": 300.0,
+                "minimum": 30.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "assessment_id"
+        ],
+        "title": "ProgressLogOut",
+        "type": "object"
+      },
+      "ProgressSummary": {
+        "properties": {
+          "adherence_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adherence Pct"
+          },
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "average_rpe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Rpe"
+          },
+          "deload_due": {
+            "title": "Deload Due",
+            "type": "boolean"
+          },
+          "latest_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Weight Kg"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "planned_sessions_per_week": {
+            "title": "Planned Sessions Per Week",
+            "type": "integer"
+          },
+          "sessions_last_28_days": {
+            "title": "Sessions Last 28 Days",
+            "type": "integer"
+          },
+          "weekly": {
+            "items": {
+              "$ref": "#/components/schemas/WeekAdherence"
+            },
+            "title": "Weekly",
+            "type": "array"
+          },
+          "weeks_on_plan": {
+            "title": "Weeks On Plan",
+            "type": "number"
+          },
+          "weight_change_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Change Kg"
+          },
+          "weights": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "planned_sessions_per_week",
+          "sessions_last_28_days",
+          "adherence_pct",
+          "average_rpe",
+          "latest_weight_kg",
+          "weight_change_kg",
+          "weeks_on_plan",
+          "deload_due",
+          "weekly",
+          "weights",
+          "notes"
+        ],
+        "title": "ProgressSummary",
+        "type": "object"
+      },
+      "RecoveryPlan": {
+        "properties": {
+          "adherence_tips": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Adherence Tips",
+            "type": "array"
+          },
+          "deload_strategy": {
+            "default": "",
+            "title": "Deload Strategy",
+            "type": "string"
+          },
+          "habit_formation_strategies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Habit Formation Strategies",
+            "type": "array"
+          },
+          "mobility_work": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Mobility Work",
+            "type": "array"
+          },
+          "recovery_techniques": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recovery Techniques",
+            "type": "array"
+          },
+          "rest_day_activities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rest Day Activities",
+            "type": "array"
+          },
+          "schedule_integration": {
+            "$ref": "#/components/schemas/ScheduleIntegration"
+          },
+          "sleep_recommendations": {
+            "$ref": "#/components/schemas/SleepRecommendations"
+          },
+          "stress_management_techniques": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Stress Management Techniques",
+            "type": "array"
+          },
+          "time_management_tips": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Time Management Tips",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sleep_recommendations",
+          "schedule_integration"
+        ],
+        "title": "RecoveryPlan",
+        "type": "object"
+      },
+      "ReplanRequest": {
+        "properties": {
+          "mode": {
+            "default": "mock",
+            "enum": [
+              "mock",
+              "live"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "title": "ReplanRequest",
+        "type": "object"
+      },
+      "SafetyResult": {
+        "properties": {
+          "constraints": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Constraints",
+            "type": "array"
+          },
+          "disclaimer": {
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "standard",
+              "conservative",
+              "clinician_first"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "max_intensity": {
+            "title": "Max Intensity",
+            "type": "string"
+          },
+          "max_sessions_per_week": {
+            "title": "Max Sessions Per Week",
+            "type": "integer"
+          },
+          "reasons": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "requires_clearance": {
+            "title": "Requires Clearance",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "level",
+          "requires_clearance",
+          "max_intensity",
+          "max_sessions_per_week",
+          "disclaimer"
+        ],
+        "title": "SafetyResult",
+        "type": "object"
+      },
+      "ScheduleIntegration": {
+        "properties": {
+          "best_days": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Best Days",
+            "type": "array"
+          },
+          "best_times": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Best Times",
+            "type": "array"
+          },
+          "weekly_schedule_tips": {
+            "default": "",
+            "title": "Weekly Schedule Tips",
+            "type": "string"
+          }
+        },
+        "title": "ScheduleIntegration",
+        "type": "object"
+      },
+      "SleepRecommendations": {
+        "properties": {
+          "hours_per_night": {
+            "maximum": 12.0,
+            "minimum": 5.0,
+            "title": "Hours Per Night",
+            "type": "number"
+          },
+          "sleep_quality_tips": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sleep Quality Tips",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hours_per_night"
+        ],
+        "title": "SleepRecommendations",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WeekAdherence": {
+        "properties": {
+          "planned": {
+            "title": "Planned",
+            "type": "integer"
+          },
+          "sessions": {
+            "title": "Sessions",
+            "type": "integer"
+          },
+          "week_start": {
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "sessions",
+          "planned"
+        ],
+        "title": "WeekAdherence",
+        "type": "object"
+      },
+      "WorkoutDay": {
+        "properties": {
+          "day": {
+            "enum": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "title": "Day",
+            "type": "string"
+          },
+          "exercises": {
+            "items": {
+              "$ref": "#/components/schemas/Exercise"
+            },
+            "maxItems": 14,
+            "minItems": 1,
+            "title": "Exercises",
+            "type": "array"
+          },
+          "focus": {
+            "default": "",
+            "maxLength": 80,
+            "title": "Focus",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "exercises"
+        ],
+        "title": "WorkoutDay",
+        "type": "object"
+      },
+      "WorkoutPlan": {
+        "properties": {
+          "weekly_schedule": {
+            "items": {
+              "$ref": "#/components/schemas/WorkoutDay"
+            },
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "Weekly Schedule",
+            "type": "array"
+          },
+          "workout_duration_per_session": {
+            "maximum": 180.0,
+            "minimum": 10.0,
+            "title": "Workout Duration Per Session",
+            "type": "integer"
+          },
+          "workout_equipment_needed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Workout Equipment Needed",
+            "type": "array"
+          },
+          "workout_frequency_per_week": {
+            "maximum": 7.0,
+            "minimum": 1.0,
+            "title": "Workout Frequency Per Week",
+            "type": "integer"
+          },
+          "workout_intensity_level": {
+            "enum": [
+              "Light",
+              "Moderate",
+              "Vigorous"
+            ],
+            "title": "Workout Intensity Level",
+            "type": "string"
+          },
+          "workout_progression_timeline": {
+            "default": "",
+            "title": "Workout Progression Timeline",
+            "type": "string"
+          },
+          "workout_safety_notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Workout Safety Notes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "weekly_schedule",
+          "workout_intensity_level",
+          "workout_frequency_per_week",
+          "workout_duration_per_session"
+        ],
+        "title": "WorkoutPlan",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Personalised fitness assessments combining calibrated ML classifiers with an LLM planning workflow. Live generation is bring-your-own-key: send your Gemini key in `X-Gemini-Api-Key` (never stored or logged).",
+    "title": "AetherFit AI API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/assessments": {
+      "get": {
+        "operationId": "list_assessments_api_v1_assessments_get",
+        "parameters": [
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssessmentSummary"
+                  },
+                  "title": "Response List Assessments Api V1 Assessments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List saved assessments for this device",
+        "tags": [
+          "assessments"
+        ]
+      },
+      "post": {
+        "operationId": "create_assessment_api_v1_assessments_post",
+        "parameters": [
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          },
+          {
+            "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+            "in": "header",
+            "name": "x-gemini-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+              "title": "X-Gemini-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Generate an assessment",
+        "tags": [
+          "assessments"
+        ]
+      }
+    },
+    "/api/v1/assessments/stream": {
+      "post": {
+        "operationId": "stream_assessment_api_v1_assessments_stream_post",
+        "parameters": [
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          },
+          {
+            "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+            "in": "header",
+            "name": "x-gemini-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+              "title": "X-Gemini-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "text/event-stream": {}
+            },
+            "description": "SSE events: start, node, result, error"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Generate an assessment, streaming per-step progress (Server-Sent Events)",
+        "tags": [
+          "assessments"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}": {
+      "delete": {
+        "operationId": "delete_assessment_api_v1_assessments__assessment_id__delete",
+        "parameters": [
+          {
+            "description": "Assessment UUID",
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "description": "Assessment UUID",
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Delete Assessment",
+        "tags": [
+          "assessments"
+        ]
+      },
+      "get": {
+        "operationId": "get_assessment_api_v1_assessments__assessment_id__get",
+        "parameters": [
+          {
+            "description": "Assessment UUID",
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "description": "Assessment UUID",
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Get Assessment",
+        "tags": [
+          "assessments"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}/export.{fmt}": {
+      "get": {
+        "operationId": "export_api_v1_assessments__assessment_id__export__fmt__get",
+        "parameters": [
+          {
+            "description": "Assessment UUID",
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "description": "Assessment UUID",
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "fmt",
+            "required": true,
+            "schema": {
+              "enum": [
+                "pdf",
+                "ics",
+                "json"
+              ],
+              "title": "Fmt",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "application/pdf": {},
+              "text/calendar": {}
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Export as PDF, iCalendar (.ics) or JSON",
+        "tags": [
+          "assessments"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}/logs": {
+      "get": {
+        "operationId": "list_logs_api_v1_assessments__assessment_id__logs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProgressLogOut"
+                  },
+                  "title": "Response List Logs Api V1 Assessments  Assessment Id  Logs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "List Logs",
+        "tags": [
+          "progress"
+        ]
+      },
+      "post": {
+        "operationId": "add_log_api_v1_assessments__assessment_id__logs_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressLogIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressLogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Add Log",
+        "tags": [
+          "progress"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}/logs/{log_id}": {
+      "delete": {
+        "operationId": "delete_log_api_v1_assessments__assessment_id__logs__log_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "log_id",
+            "required": true,
+            "schema": {
+              "title": "Log Id",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Delete Log",
+        "tags": [
+          "progress"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}/progress": {
+      "get": {
+        "operationId": "get_progress_api_v1_assessments__assessment_id__progress_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Progress",
+        "tags": [
+          "progress"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}/replan": {
+      "post": {
+        "operationId": "replan_api_v1_assessments__assessment_id__replan_post",
+        "parameters": [
+          {
+            "description": "Assessment UUID",
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "description": "Assessment UUID",
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          },
+          {
+            "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+            "in": "header",
+            "name": "x-gemini-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+              "title": "X-Gemini-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Regenerate the next training block using logged progress",
+        "tags": [
+          "assessments"
+        ]
+      }
+    },
+    "/api/v1/assessments/{assessment_id}/replan/stream": {
+      "post": {
+        "operationId": "replan_stream_api_v1_assessments__assessment_id__replan_stream_post",
+        "parameters": [
+          {
+            "description": "Assessment UUID",
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "description": "Assessment UUID",
+              "maxLength": 36,
+              "minLength": 36,
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+            "in": "header",
+            "name": "x-device-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anonymous, client-generated identifier that scopes saved plans to one browser.",
+              "title": "X-Device-Id"
+            }
+          },
+          {
+            "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+            "in": "header",
+            "name": "x-gemini-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bring-your-own Gemini API key. Used for this request only; never stored or logged.",
+              "title": "X-Gemini-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or missing Gemini API key (live mode)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited (this API or the Gemini key's quota)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Replan, streaming progress (SSE)",
+        "tags": [
+          "assessments"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/v1/models/evaluation": {
+      "get": {
+        "operationId": "models_evaluation_api_v1_models_evaluation_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "refresh",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Refresh",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Models Evaluation Api V1 Models Evaluation Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accuracy, per-class metrics and confusion matrices on the evaluation CSVs",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/v1/models/info": {
+      "get": {
+        "operationId": "models_info_api_v1_models_info_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Models Info Api V1 Models Info Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Model metadata, training-data provenance and limitations",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/v1/workflow": {
+      "get": {
+        "operationId": "workflow_api_v1_workflow_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Workflow Api V1 Workflow Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The pipeline steps, in order",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

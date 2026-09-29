@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "trained_at": "2026-09-29T17:49:22+00:00",
+  "seed": 42,
+  "environment": {
+    "python": "3.11.2",
+    "scikit_learn": "1.9.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "joblib": "1.6.0"
+  },
+  "models": {
+    "fitness_level": {
+      "name": "fitness_level",
+      "target": "Fitness_Level_Class",
+      "classes": [
+        "Beginner",
+        "Intermediate",
+        "Advanced",
+        "Athlete"
+      ],
+      "features": {
+        "numeric": [
+          "Age",
+          "BMI",
+          "Weight_KG",
+          "Available_Hours_Per_Week"
+        ],
+        "categorical": [
+          "Gender",
+          "Fitness_Experience",
+          "Fitness_Goal"
+        ]
+      },
+      "training_ranges": {
+        "Age": {
+          "min": 18.0,
+          "max": 70.0
+        },
+        "BMI": {
+          "min": 16.3,
+          "max": 41.1
+        },
+        "Weight_KG": {
+          "min": 45.0,
+          "max": 120.0
+        },
+        "Available_Hours_Per_Week": {
+          "min": 1.0,
+          "max": 20.0
+        }
+      },
+      "baseline": {
+        "Age": 37.0,
+        "BMI": 24.0,
+        "Weight_KG": 69.2,
+        "Available_Hours_Per_Week": 4.82,
+        "Gender": "Male",
+        "Fitness_Experience": "Some Experience",
+        "Fitness_Goal": "Weight Loss"
+      },
+      "global_feature_importance": {
+        "Available_Hours_Per_Week": 0.3941835254299481,
+        "Fitness_Experience": 0.18911350869474958,
+        "BMI": 0.15404465423007763,
+        "Age": 0.15363981589386835,
+        "Weight_KG": 0.07680373584546794,
+        "Fitness_Goal": 0.021605922194750157,
+        "Gender": 0.010608837711138245
+      },
+      "data": {
+        "training_file": "fitness_level_training.csv",
+        "training_sha256": "eac4bebdc241180d84f3a350ab14d3786dafa09a77d07ccc046bde0f70bb4721",
+        "evaluation_file": "fitness_level_evaluation.csv",
+        "evaluation_sha256": "5da24c1c534e8593167a49a025183c22131feac02eaac0ba5fb5e9e23e13a48e",
+        "cleaning_report_training": {
+          "rows_in": 30000,
+          "dropped_duplicates": 0,
+          "dropped_out_of_range": 0,
+          "imputed_numeric_cells": 1647,
+          "dropped_invalid_binary": 0,
+          "dropped_invalid_categorical": 991,
+          "rows_out": 29009
+        },
+        "cleaning_report_evaluation": {
+          "rows_in": 8000,
+          "dropped_duplicates": 0,
+          "dropped_out_of_range": 0,
+          "imputed_numeric_cells": 0,
+          "dropped_invalid_binary": 0,
+          "dropped_invalid_categorical": 0,
+          "rows_out": 8000
+        },
+        "provenance": "Bundled CSVs of unknown origin whose statistics indicate a synthetic generator; not clinically validated."
+      },
+      "cross_validation": {
+        "folds": 5,
+        "accuracy_mean": 0.7392878333271238,
+        "accuracy_std": 0.00512959846476576
+      },
+      "evaluation": {
+        "samples": 8000,
+        "accuracy": 0.79175,
+        "macro_f1": 0.7821638538994931,
+        "within_one_class_accuracy": 0.997375,
+        "log_loss": 0.5293924873815444,
+        "expected_calibration_error": 0.05296335768714268,
+        "classes": [
+          "Beginner",
+          "Intermediate",
+          "Advanced",
+          "Athlete"
+        ],
+        "precision_per_class": {
+          "Beginner": 0.8820861678004536,
+          "Intermediate": 0.6662797446314568,
+          "Advanced": 0.6708732963149924,
+          "Athlete": 0.9143950263032042
+        },
+        "recall_per_class": {
+          "Beginner": 0.8844929513415188,
+          "Intermediate": 0.6639676113360324,
+          "Advanced": 0.7214983713355049,
+          "Athlete": 0.8573991031390135
+        },
+        "f1_per_class": {
+          "Beginner": 0.8832879200726612,
+          "Intermediate": 0.6651216685979142,
+          "Advanced": 0.6952654982997646,
+          "Athlete": 0.8849803286276325
+        },
+        "support_per_class": {
+          "Beginner": 2199,
+          "Intermediate": 1729,
+          "Advanced": 1842,
+          "Athlete": 2230
+        },
+        "confusion_matrix": [
+          [
+            1945,
+            244,
+            10,
+            0
+          ],
+          [
+            253,
+            1148,
+            325,
+            3
+          ],
+          [
+            7,
+            330,
+            1329,
+            176
+          ],
+          [
+            0,
+            1,
+            317,
+            1912
+          ]
+        ]
+      },
+      "artifact": "fitness_level.joblib",
+      "artifact_sha256": "61c88968e366a0ba81c396793ae9951fff1f85a64202113b304a0e7c8f9e1950",
+      "artifact_bytes": 6562717
+    },
+    "injury_risk": {
+      "name": "injury_risk",
+      "target": "Injury_Risk_Class",
+      "classes": [
+        "Low Risk",
+        "Moderate Risk",
+        "High Risk",
+        "Very High Risk"
+      ],
+      "features": {
+        "numeric": [
+          "Age",
+          "BMI",
+          "Has_Health_Conditions",
+          "Previous_Injury",
+          "Training_Frequency_Hours"
+        ],
+        "categorical": [
+          "Gender",
+          "Fitness_Level",
+          "Fitness_Experience"
+        ]
+      },
+      "training_ranges": {
+        "Age": {
+          "min": 18.0,
+          "max": 70.0
+        },
+        "BMI": {
+          "min": 15.5,
+          "max": 41.1
+        },
+        "Has_Health_Conditions": {
+          "min": 0.0,
+          "max": 1.0
+        },
+        "Previous_Injury": {
+          "min": 0.0,
+          "max": 1.0
+        },
+        "Training_Frequency_Hours": {
+          "min": 1.0,
+          "max": 20.0
+        }
+      },
+      "baseline": {
+        "Age": 37.0,
+        "BMI": 24.1,
+        "Has_Health_Conditions": 0.0,
+        "Previous_Injury": 0.0,
+        "Training_Frequency_Hours": 4.87,
+        "Gender": "Male",
+        "Fitness_Level": "Beginner",
+        "Fitness_Experience": "Some Experience"
+      },
+      "global_feature_importance": {
+        "Previous_Injury": 0.31896590394690577,
+        "Has_Health_Conditions": 0.2727531313161036,
+        "Fitness_Level": 0.1684622861762175,
+        "BMI": 0.07856317492375435,
+        "Age": 0.0762310278715711,
+        "Training_Frequency_Hours": 0.05038348963492423,
+        "Fitness_Experience": 0.02856125110212636,
+        "Gender": 0.006079735028397035
+      },
+      "data": {
+        "training_file": "injury_risk_training.csv",
+        "training_sha256": "9ead8187f6e0d8415c40b2496e32383a23cd3aee6821c28074c2b16a241029a6",
+        "evaluation_file": "injury_risk_evaluation.csv",
+        "evaluation_sha256": "fc7384dc07a154db672fd11468396f341fd578bab0227bf9d5edc834de952ceb",
+        "cleaning_report_training": {
+          "rows_in": 30000,
+          "dropped_duplicates": 0,
+          "dropped_out_of_range": 0,
+          "imputed_numeric_cells": 0,
+          "dropped_invalid_binary": 612,
+          "dropped_invalid_categorical": 620,
+          "rows_out": 28768
+        },
+        "cleaning_report_evaluation": {
+          "rows_in": 8000,
+          "dropped_duplicates": 0,
+          "dropped_out_of_range": 0,
+          "imputed_numeric_cells": 0,
+          "dropped_invalid_binary": 0,
+          "dropped_invalid_categorical": 0,
+          "rows_out": 8000
+        },
+        "provenance": "Bundled CSVs of unknown origin whose statistics indicate a synthetic generator; not clinically validated."
+      },
+      "cross_validation": {
+        "folds": 5,
+        "accuracy_mean": 0.8037057874506062,
+        "accuracy_std": 0.0063988568007145195
+      },
+      "evaluation": {
+        "samples": 8000,
+        "accuracy": 0.691875,
+        "macro_f1": 0.6822159917718247,
+        "within_one_class_accuracy": 0.999625,
+        "log_loss": 0.7742720153720573,
+        "expected_calibration_error": 0.09918253344960326,
+        "classes": [
+          "Low Risk",
+          "Moderate Risk",
+          "High Risk",
+          "Very High Risk"
+        ],
+        "precision_per_class": {
+          "Low Risk": 0.9661246612466124,
+          "Moderate Risk": 0.5954773869346733,
+          "High Risk": 0.7112326043737575,
+          "Very High Risk": 0.7236205227492739
+        },
+        "recall_per_class": {
+          "Low Risk": 0.3565,
+          "Moderate Risk": 0.79,
+          "High Risk": 0.7155,
+          "Very High Risk": 0.934375
+        },
+        "f1_per_class": {
+          "Low Risk": 0.5208181154127101,
+          "Moderate Risk": 0.6790830945558739,
+          "High Risk": 0.7133599202392822,
+          "Very High Risk": 0.8156028368794326
+        },
+        "support_per_class": {
+          "Low Risk": 2000,
+          "Moderate Risk": 2400,
+          "High Risk": 2000,
+          "Very High Risk": 1600
+        },
+        "confusion_matrix": [
+          [
+            713,
+            1287,
+            0,
+            0
+          ],
+          [
+            25,
+            1896,
+            476,
+            3
+          ],
+          [
+            0,
+            1,
+            1431,
+            568
+          ],
+          [
+            0,
+            0,
+            105,
+            1495
+          ]
+        ]
+      },
+      "artifact": "injury_risk.joblib",
+      "artifact_sha256": "bdf6ecbc436421a60799a76add0eea823e141f28769faac9e89350ae1ea351f0",
+      "artifact_bytes": 5636339
+    }
+  }
+}
