@@ -1,11 +1,45 @@
 import json
+import os
+import threading
 from datetime import datetime, timezone
 
 import streamlit as st
 
 from graph import assess_fitness
 from ml.evaluation.evaluate_models import evaluate_all_models
+from utils import demo_guard, gateway
 from utils.gemini_client import build_gemini_client
+from utils.openai_compat_client import OpenAICompatClient
+
+MODE_FREE = "Free Demo (live LLM)"
+MODE_GEMINI = "Use My Gemini API Key"
+MODE_OPENAI = "Use My OpenAI-Compatible Key"
+MODE_MOCK = "Mock Demo"  # simulated output: offered only for offline development (ENABLE_MOCK=1)
+MODES = [MODE_FREE, MODE_GEMINI, MODE_OPENAI] + ([MODE_MOCK] if os.getenv("ENABLE_MOCK") == "1" else [])
+FREE_DEMO_CREDITS = 4  # one assessment = 4 LLM calls (normalise, workout, nutrition, recovery)
+OPENAI_PROVIDERS = {
+    "OpenAI": "https://api.openai.com/v1",
+    "Groq": "https://api.groq.com/openai/v1",
+    "OpenRouter": "https://openrouter.ai/api/v1",
+    "Google Gemini (OpenAI-compatible)": "https://generativelanguage.googleapis.com/v1beta/openai",
+}
+
+
+@st.cache_resource
+def _start_gateway() -> bool:
+    """Find the private FreeLLMAPI gateway in this container (no-op when LLM_BASE_URL is already set)."""
+    threading.Thread(target=gateway.connect, daemon=True, name="gateway-connect").start()
+    return True
+
+
+def _client_ip() -> str:
+    try:
+        fwd = st.context.headers.get("X-Forwarded-For", "")
+        if fwd:
+            return fwd.split(",")[-1].strip()  # the proxy appends the real client IP last; earlier entries are spoofable
+    except Exception:
+        pass
+    return "unknown"
 
 
 def initialize_session_state():
@@ -16,9 +50,13 @@ def initialize_session_state():
     if "eval_results" not in st.session_state:
         st.session_state.eval_results = None
     if "generation_mode" not in st.session_state:
-        st.session_state.generation_mode = "Mock Demo"
+        st.session_state.generation_mode = MODE_FREE
     if "user_gemini_api_key" not in st.session_state:
         st.session_state.user_gemini_api_key = ""
+    if "user_llm_key" not in st.session_state:
+        st.session_state.user_llm_key = ""
+    if "user_llm_provider" not in st.session_state:
+        st.session_state.user_llm_provider = "OpenAI"
     if "client_signature" not in st.session_state:
         st.session_state.client_signature = None
 
@@ -26,17 +64,41 @@ def initialize_session_state():
 def setup_api_client():
     try:
         mode = st.session_state.generation_mode
-        use_mock = mode == "Mock Demo"
-        api_key = st.session_state.user_gemini_api_key.strip()
-        client_signature = ("mock", None) if use_mock else ("byok", api_key)
+        gemini_key = st.session_state.user_gemini_api_key.strip()
+        llm_key = st.session_state.user_llm_key.strip()
+        provider = st.session_state.user_llm_provider
 
-        if not use_mock and not api_key:
+        if mode == MODE_MOCK:
+            signature = ("mock",)
+        elif mode == MODE_GEMINI:
+            signature = ("gemini", gemini_key)
+        elif mode == MODE_OPENAI:
+            signature = ("openai", provider, llm_key)
+        else:
+            signature = ("free", os.environ.get("LLM_BASE_URL", ""), os.environ.get("LLM_API_KEY", ""))
+
+        if mode == MODE_GEMINI and not gemini_key:
             st.error("Enter your Gemini API key to use live generation.")
             return False
+        if mode == MODE_OPENAI and not llm_key:
+            st.error("Enter your API key to use live generation.")
+            return False
+        if mode == MODE_FREE and not os.environ.get("LLM_BASE_URL"):
+            st.error("The free LLM gateway is still starting. Please try again in a few seconds.")
+            return False
 
-        if st.session_state.client is None or st.session_state.client_signature != client_signature:
-            st.session_state.client = build_gemini_client(api_key=api_key, use_mock=use_mock)
-            st.session_state.client_signature = client_signature
+        if st.session_state.client is None or st.session_state.client_signature != signature:
+            if mode == MODE_MOCK:
+                st.session_state.client = build_gemini_client(use_mock=True)
+            elif mode == MODE_GEMINI:
+                st.session_state.client = build_gemini_client(api_key=gemini_key)
+            elif mode == MODE_OPENAI:
+                st.session_state.client = OpenAICompatClient(api_key=llm_key, base_url=OPENAI_PROVIDERS[provider])
+            else:
+                st.session_state.client = OpenAICompatClient(
+                    api_key=os.environ.get("LLM_API_KEY", ""), base_url=os.environ["LLM_BASE_URL"]
+                )
+            st.session_state.client_signature = signature
         return True
     except Exception as exc:
         st.session_state.client = None
@@ -52,6 +114,7 @@ def reset_runtime_client():
 
 def clear_api_key():
     st.session_state.user_gemini_api_key = ""
+    st.session_state.user_llm_key = ""
     reset_runtime_client()
 
 
@@ -174,21 +237,25 @@ def main():
     st.set_page_config(page_title="AetherFit AI", layout="wide")
     initialize_session_state()
 
+    _start_gateway()
     st.title("AetherFit AI")
     st.write("Personalized Fitness Assessment System")
-    if st.session_state.generation_mode == "Mock Demo":
-        st.warning("Mock Demo is active. Results are simulated and no API key is required.")
+    if st.session_state.generation_mode == MODE_MOCK:
+        st.warning("Mock Demo is active. Results are simulated test data, not model output.")
+    elif st.session_state.generation_mode == MODE_FREE:
+        st.info(
+            "Free demo: the plans are written live by an LLM through a free-tier gateway. "
+            "Each visitor gets a small daily allowance; use your own key in the sidebar for more."
+        )
 
     with st.sidebar:
         st.header("User Input")
         previous_mode = st.session_state.generation_mode
         previous_api_key = st.session_state.user_gemini_api_key
-        generation_mode = st.radio(
-            "Generation Mode",
-            ["Mock Demo", "Use My Gemini API Key"],
-            key="generation_mode",
-        )
-        if generation_mode == "Use My Gemini API Key":
+        previous_llm_key = st.session_state.user_llm_key
+        previous_provider = st.session_state.user_llm_provider
+        generation_mode = st.radio("Generation Mode", MODES, key="generation_mode")
+        if generation_mode == MODE_GEMINI:
             st.text_input(
                 "Gemini API Key",
                 type="password",
@@ -197,10 +264,17 @@ def main():
             )
             st.caption("Your API key is used only for this session and is not stored.")
             st.button("Clear API Key", on_click=clear_api_key)
+        elif generation_mode == MODE_OPENAI:
+            st.selectbox("Provider", list(OPENAI_PROVIDERS), key="user_llm_provider")
+            st.text_input("API Key", type="password", key="user_llm_key", help="Used only for this session and not stored.")
+            st.caption("Your API key is used only for this session and is not stored.")
+            st.button("Clear API Key", on_click=clear_api_key)
 
         if (
             st.session_state.generation_mode != previous_mode
             or st.session_state.user_gemini_api_key != previous_api_key
+            or st.session_state.user_llm_key != previous_llm_key
+            or st.session_state.user_llm_provider != previous_provider
         ):
             reset_runtime_client()
 
@@ -217,7 +291,16 @@ def main():
         run_evaluation = st.button("Run Model Evaluation")
 
     if generate and setup_api_client():
-        with st.spinner("Generating fitness plan..."):
+        admitted = True
+        if st.session_state.generation_mode == MODE_FREE:
+            decision = demo_guard.check(_client_ip(), FREE_DEMO_CREDITS, byo=False)
+            if not decision.allowed:
+                admitted = False
+                st.error(decision.message)
+    else:
+        admitted = False
+    if generate and admitted:
+        with st.spinner("Generating fitness plan (live LLM, can take up to ~60 s)..."):
             st.session_state.assessment_result = assess_fitness(
                 age=age,
                 height_cm=height,

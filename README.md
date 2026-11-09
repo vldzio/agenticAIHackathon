@@ -75,3 +75,14 @@ Click **Run Model Evaluation** in the Streamlit UI to inspect the metrics on the
 ## Intended use
 
 AetherFit demonstrates how tabular ML predictions and LLM-assisted planning can work together in an interactive assessment. **It is an exploratory fitness/wellness prototype, not a clinically validated injury-screening, medical, or nutrition service.** Treat any guidance as illustrative and consult qualified professionals for individual health decisions.
+
+## Live demo deployment
+
+The hosted app runs as one Hugging Face Docker Space ([`deploy/space/`](deploy/space)) containing the Streamlit app plus a **private** [FreeLLMAPI](https://github.com/tashfeenahmed/freellmapi) gateway:
+
+* **Free Demo (live LLM)** is the default mode: the normaliser, workout, nutrition and recovery steps are generated live by a free-tier model through the gateway (`utils/openai_compat_client.py`, schema-checked with one corrective retry). Each visitor gets a small daily allowance (4 credits per assessment, per-IP and global caps in Upstash Redis).
+* **Use My Gemini API Key** / **Use My OpenAI-Compatible Key** bypass the shared allowance and use the visitor's own provider account (kept in the session only).
+* **Mock Demo** returns simulated placeholder output, so it is **not offered on the hosted app**; it exists for offline development and appears only when `ENABLE_MOCK=1`.
+* Every assessment is traced to LangSmith (project `aetherfit-demo`): the LangGraph nodes and each model call.
+* `requirements.txt` now pins `scikit-learn==1.8.0` (the version the shipped `ml/models/*.pkl` were saved with) and `pyarrow==18.1.0` (newer pyarrow needs NumPy 2, which LangChain 0.3 forbids).
+* Tests: `pip install -r requirements.txt && pytest tests/test_demo.py` (drives the real Streamlit app, LangGraph workflow and ML models against a stub LLM endpoint).
