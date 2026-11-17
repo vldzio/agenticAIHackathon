@@ -272,6 +272,10 @@ def main():
     _start_gateway()
     st.title("AetherFit AI")
     st.write("Personalized Fitness Assessment System")
+    st.caption(
+        "Enter your details in the sidebar (on a phone, open it with the arrow at the top left), "
+        "then choose Generate Assessment. The plans are written live by an LLM and can take a minute or two."
+    )
     if st.session_state.generation_mode == MODE_MOCK:
         st.warning("Mock Demo is active. Results are simulated test data, not model output.")
     elif st.session_state.generation_mode == MODE_FREE:
