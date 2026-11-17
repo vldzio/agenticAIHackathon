@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
-from utils import demo_guard  # noqa: E402
+from utils import demo_guard, openai_compat_client  # noqa: E402
 from utils.gemini_client import _mock_payload_for_prompt  # noqa: E402  (test data generator only)
 from utils.openai_compat_client import OpenAICompatClient  # noqa: E402
 
@@ -25,12 +25,21 @@ from utils.openai_compat_client import OpenAICompatClient  # noqa: E402
 class _Stub(BaseHTTPRequestHandler):
     replies: list = []  # optional queue of raw replies; empty -> well-formed payload for the prompt
     seen_auth: list = []
+    seen_models: list = []
+    fail_models: set = set()
     calls = 0
 
     def do_POST(self):  # noqa: N802
         body = json.loads(self.rfile.read(int(self.headers.get("content-length", 0))) or b"{}")
         type(self).calls += 1
         type(self).seen_auth.append(self.headers.get("authorization", ""))
+        type(self).seen_models.append(body.get("model"))
+        if body.get("model") in type(self).fail_models:  # e.g. a rate-limited free model
+            self.send_response(429)
+            self.send_header("content-length", "2")
+            self.end_headers()
+            self.wfile.write(b"{}")
+            return
         user = next((m["content"] for m in reversed(body["messages"]) if m["role"] == "user"), "")
         content = type(self).replies.pop(0) if type(self).replies else json.dumps(_mock_payload_for_prompt(user))
         payload = {"id": "x", "object": "chat.completion", "created": 0, "model": "auto",
@@ -52,6 +61,8 @@ def gateway(monkeypatch):
     server = HTTPServer(("127.0.0.1", 0), _Stub)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     _Stub.replies, _Stub.seen_auth, _Stub.calls = [], [], 0
+    _Stub.seen_models, _Stub.fail_models = [], set()
+    openai_compat_client._cooldown_until.clear()
     monkeypatch.setenv("LLM_BASE_URL", f"http://127.0.0.1:{server.server_port}/v1")
     monkeypatch.setenv("LLM_API_KEY", "gateway-key")
     monkeypatch.delenv("LANGSMITH_TRACING", raising=False)
@@ -86,6 +97,26 @@ def test_client_gives_up_after_retry(gateway):
     gateway.replies = ["nope", "still nope"]
     with pytest.raises(ValueError):
         client_for(__import__("os").environ["LLM_BASE_URL"]).generate_structured_json("p", ["a"])
+
+
+def test_model_chain_falls_through_and_rests_a_failed_model(gateway):
+    gateway.fail_models = {"fast-a"}
+    client = OpenAICompatClient(api_key="k", base_url=__import__("os").environ["LLM_BASE_URL"], models=["fast-a", "slow-b@low", "auto"])
+    gateway.replies = ['{"a": 1}', '{"a": 2}']
+    assert client.generate_structured_json("p", ["a"]) == {"a": 1}
+    assert gateway.seen_models == ["fast-a", "slow-b"]  # "@low" is the reasoning effort, not part of the name
+    assert client.generate_structured_json("p", ["a"]) == {"a": 2}
+    assert gateway.seen_models[2:] == ["slow-b"]  # the failed model is skipped while it cools down
+
+
+def test_free_mode_uses_the_pinned_chain_but_own_key_does_not(gateway, monkeypatch):
+    monkeypatch.setenv("LLM_MODELS", "pinned-1,auto")
+    assert openai_compat_client.free_demo_models() == ["pinned-1", "auto"]
+    assert client_for("http://x/v1").models == ["auto"]  # a visitor's own key never gets gateway model names
+    at = AppTest.from_file(str(ROOT / "main.py"), default_timeout=120).run()
+    click(at, "Generate Assessment")
+    assert any("Assessment generated" in s.value for s in at.success), [e.value for e in at.error]
+    assert set(gateway.seen_models) == {"pinned-1"}
 
 
 def test_app_defaults_to_free_live_mode_and_hides_mock(gateway):

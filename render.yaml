@@ -16,3 +16,5 @@ services:
       - { key: LANGSMITH_API_KEY, sync: false }
       - { key: RL_PER_IP_DAILY, value: "20" }       # 4 credits per assessment = 5/day per visitor
       - { key: RL_GLOBAL_DAILY, value: "1000" }
+      # Optional: LLM_MODELS overrides the model chain (comma-separated, fastest first, "name@low" sets
+      # reasoning effort). The default lives in utils/openai_compat_client.py.

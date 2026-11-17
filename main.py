@@ -10,7 +10,7 @@ from graph import assess_fitness
 from ml.evaluation.evaluate_models import evaluate_all_models
 from utils import demo_guard, gateway
 from utils.gemini_client import build_gemini_client
-from utils.openai_compat_client import OpenAICompatClient
+from utils.openai_compat_client import OpenAICompatClient, free_demo_models
 
 MODE_FREE = "Free Demo (live LLM)"
 MODE_GEMINI = "Use My Gemini API Key"
@@ -100,7 +100,8 @@ def setup_api_client():
                 st.session_state.client = OpenAICompatClient(api_key=llm_key, base_url=OPENAI_PROVIDERS[provider])
             else:
                 st.session_state.client = OpenAICompatClient(
-                    api_key=os.environ.get("LLM_API_KEY", ""), base_url=os.environ["LLM_BASE_URL"]
+                    api_key=os.environ.get("LLM_API_KEY", ""), base_url=os.environ["LLM_BASE_URL"],
+                    models=free_demo_models(),
                 )
             st.session_state.client_signature = signature
         return True
