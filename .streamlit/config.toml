@@ -1,0 +1,15 @@
+# Visual theme shared with the portfolio and the other demos (olive-neutral dark, AetherFit coral accent).
+[theme]
+base = "dark"
+primaryColor = "#b8502b"
+backgroundColor = "#10120f"
+secondaryBackgroundColor = "#1b2019"
+textColor = "#eeeee3"
+borderColor = "#343b30"
+linkColor = "#f2a27e"
+baseRadius = "medium"
+font = "sans-serif"
+showWidgetBorder = true
+
+[theme.sidebar]
+backgroundColor = "#161914"
