@@ -1,0 +1,689 @@
+{
+  "pipeline_status": "success",
+  "fitness_training": {
+    "model_accuracy": 0.7599710434692681,
+    "validation": "stratified 5-fold cross-validation on the training data",
+    "cv_metrics": {
+      "eval_accuracy": 0.7599710434692681,
+      "accuracy_ci95": [
+        0.7551096211520563,
+        0.7650401599503602
+      ],
+      "majority_baseline_accuracy": 0.28156778930676685,
+      "balanced_accuracy": 0.7480559035150968,
+      "macro_f1": 0.7482671509143826,
+      "weighted_f1": 0.7604042916975918,
+      "within_one_class_accuracy": 0.9908993760557069,
+      "quadratic_weighted_kappa": 0.8974041590648142,
+      "log_loss": 0.5573332396176728,
+      "expected_calibration_error": 0.016576533213517233,
+      "mean_confidence": 0.7476139800974788,
+      "total_samples": 29009,
+      "classes": [
+        "Beginner",
+        "Intermediate",
+        "Advanced",
+        "Athlete"
+      ],
+      "class_counts": {
+        "Beginner": 8168,
+        "Intermediate": 6195,
+        "Advanced": 6826,
+        "Athlete": 7820
+      },
+      "predicted_counts": {
+        "Beginner": 8032,
+        "Intermediate": 6004,
+        "Advanced": 7210,
+        "Athlete": 7763
+      },
+      "precision_per_class": {
+        "Beginner": 0.8596862549800797,
+        "Intermediate": 0.6137574950033311,
+        "Advanced": 0.6484049930651873,
+        "Athlete": 0.8735025119154965
+      },
+      "recall_per_class": {
+        "Beginner": 0.8453721841332027,
+        "Intermediate": 0.5948345439870864,
+        "Advanced": 0.6848813360679754,
+        "Athlete": 0.8671355498721227
+      },
+      "f1_per_class": {
+        "Beginner": 0.8524691358024692,
+        "Intermediate": 0.6041478809738503,
+        "Advanced": 0.6661442006269592,
+        "Athlete": 0.8703073862542514
+      },
+      "support_per_class": {
+        "Beginner": 8168.0,
+        "Intermediate": 6195.0,
+        "Advanced": 6826.0,
+        "Athlete": 7820.0
+      },
+      "classification_report": {
+        "Beginner": {
+          "precision": 0.8596862549800797,
+          "recall": 0.8453721841332027,
+          "f1-score": 0.8524691358024692,
+          "support": 8168.0
+        },
+        "Intermediate": {
+          "precision": 0.6137574950033311,
+          "recall": 0.5948345439870864,
+          "f1-score": 0.6041478809738503,
+          "support": 6195.0
+        },
+        "Advanced": {
+          "precision": 0.6484049930651873,
+          "recall": 0.6848813360679754,
+          "f1-score": 0.6661442006269592,
+          "support": 6826.0
+        },
+        "Athlete": {
+          "precision": 0.8735025119154965,
+          "recall": 0.8671355498721227,
+          "f1-score": 0.8703073862542514,
+          "support": 7820.0
+        },
+        "accuracy": 0.7599710434692681,
+        "macro avg": {
+          "precision": 0.7488378137410237,
+          "recall": 0.7480559035150968,
+          "f1-score": 0.7482671509143826,
+          "support": 29009.0
+        },
+        "weighted avg": {
+          "precision": 0.7611757433232818,
+          "recall": 0.7599710434692681,
+          "f1-score": 0.7604042916975918,
+          "support": 29009.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          6905,
+          1090,
+          127,
+          46
+        ],
+        [
+          1086,
+          3685,
+          1398,
+          26
+        ],
+        [
+          36,
+          1205,
+          4675,
+          910
+        ],
+        [
+          5,
+          24,
+          1010,
+          6781
+        ]
+      ]
+    },
+    "total_samples": 29009,
+    "classes": [
+      "Beginner",
+      "Intermediate",
+      "Advanced",
+      "Athlete"
+    ],
+    "feature_importance": {
+      "Age": 0.2007,
+      "BMI": 0.2388,
+      "Weight_KG": 0.0139,
+      "Available_Hours_Per_Week": 0.3604,
+      "Gender": 0.0015,
+      "Fitness_Experience": 0.2485,
+      "Fitness_Goal": 0.0209
+    },
+    "classification_report": {
+      "Beginner": {
+        "precision": 0.8596862549800797,
+        "recall": 0.8453721841332027,
+        "f1-score": 0.8524691358024692,
+        "support": 8168.0
+      },
+      "Intermediate": {
+        "precision": 0.6137574950033311,
+        "recall": 0.5948345439870864,
+        "f1-score": 0.6041478809738503,
+        "support": 6195.0
+      },
+      "Advanced": {
+        "precision": 0.6484049930651873,
+        "recall": 0.6848813360679754,
+        "f1-score": 0.6661442006269592,
+        "support": 6826.0
+      },
+      "Athlete": {
+        "precision": 0.8735025119154965,
+        "recall": 0.8671355498721227,
+        "f1-score": 0.8703073862542514,
+        "support": 7820.0
+      },
+      "accuracy": 0.7599710434692681,
+      "macro avg": {
+        "precision": 0.7488378137410237,
+        "recall": 0.7480559035150968,
+        "f1-score": 0.7482671509143826,
+        "support": 29009.0
+      },
+      "weighted avg": {
+        "precision": 0.7611757433232818,
+        "recall": 0.7599710434692681,
+        "f1-score": 0.7604042916975918,
+        "support": 29009.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        6905,
+        1090,
+        127,
+        46
+      ],
+      [
+        1086,
+        3685,
+        1398,
+        26
+      ],
+      [
+        36,
+        1205,
+        4675,
+        910
+      ],
+      [
+        5,
+        24,
+        1010,
+        6781
+      ]
+    ]
+  },
+  "injury_training": {
+    "model_accuracy": 0.7813195216907676,
+    "validation": "stratified 5-fold cross-validation on the training data",
+    "cv_metrics": {
+      "eval_accuracy": 0.7813195216907676,
+      "accuracy_ci95": [
+        0.7766259385428254,
+        0.7862208008898777
+      ],
+      "majority_baseline_accuracy": 0.29751807563959953,
+      "balanced_accuracy": 0.7854523605274057,
+      "macro_f1": 0.7860998687958564,
+      "weighted_f1": 0.7813609192014713,
+      "within_one_class_accuracy": 0.9992352614015573,
+      "quadratic_weighted_kappa": 0.9031076679582545,
+      "log_loss": 0.5093179657421288,
+      "expected_calibration_error": 0.007543639485404457,
+      "mean_confidence": 0.7825103905971572,
+      "total_samples": 28768,
+      "classes": [
+        "Low Risk",
+        "Moderate Risk",
+        "High Risk",
+        "Very High Risk"
+      ],
+      "class_counts": {
+        "Low Risk": 7154,
+        "Moderate Risk": 8559,
+        "High Risk": 7235,
+        "Very High Risk": 5820
+      },
+      "predicted_counts": {
+        "Low Risk": 7496,
+        "Moderate Risk": 8247,
+        "High Risk": 7568,
+        "Very High Risk": 5457
+      },
+      "precision_per_class": {
+        "Low Risk": 0.7794823906083245,
+        "Moderate Risk": 0.7505759670183096,
+        "High Risk": 0.757531712473573,
+        "Very High Risk": 0.8632948506505406
+      },
+      "recall_per_class": {
+        "Low Risk": 0.8167458764327649,
+        "Moderate Risk": 0.7232153288935623,
+        "High Risk": 0.7923980649619903,
+        "Very High Risk": 0.8094501718213059
+      },
+      "f1_per_class": {
+        "Low Risk": 0.797679180887372,
+        "Moderate Risk": 0.7366416755920504,
+        "High Risk": 0.7745727217455921,
+        "Very High Risk": 0.8355058969584109
+      },
+      "support_per_class": {
+        "Low Risk": 7154.0,
+        "Moderate Risk": 8559.0,
+        "High Risk": 7235.0,
+        "Very High Risk": 5820.0
+      },
+      "classification_report": {
+        "Low Risk": {
+          "precision": 0.7794823906083245,
+          "recall": 0.8167458764327649,
+          "f1-score": 0.797679180887372,
+          "support": 7154.0
+        },
+        "Moderate Risk": {
+          "precision": 0.7505759670183096,
+          "recall": 0.7232153288935623,
+          "f1-score": 0.7366416755920504,
+          "support": 8559.0
+        },
+        "High Risk": {
+          "precision": 0.757531712473573,
+          "recall": 0.7923980649619903,
+          "f1-score": 0.7745727217455921,
+          "support": 7235.0
+        },
+        "Very High Risk": {
+          "precision": 0.8632948506505406,
+          "recall": 0.8094501718213059,
+          "f1-score": 0.8355058969584109,
+          "support": 5820.0
+        },
+        "accuracy": 0.7813195216907676,
+        "macro avg": {
+          "precision": 0.7877212301876869,
+          "recall": 0.7854523605274057,
+          "f1-score": 0.7860998687958564,
+          "support": 28768.0
+        },
+        "weighted avg": {
+          "precision": 0.7823176687518809,
+          "recall": 0.7813195216907676,
+          "f1-score": 0.7813609192014713,
+          "support": 28768.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          5843,
+          1311,
+          0,
+          0
+        ],
+        [
+          1637,
+          6190,
+          732,
+          0
+        ],
+        [
+          16,
+          740,
+          5733,
+          746
+        ],
+        [
+          0,
+          6,
+          1103,
+          4711
+        ]
+      ]
+    },
+    "total_samples": 28768,
+    "classes": [
+      "Low Risk",
+      "Moderate Risk",
+      "High Risk",
+      "Very High Risk"
+    ],
+    "feature_importance": {
+      "Age": 0.1225,
+      "BMI": 0.1219,
+      "Gender": 0.0004,
+      "Fitness_Experience": 0.095,
+      "Has_Health_Conditions": 0.2526,
+      "Previous_Injury": 0.302,
+      "Training_Frequency_Hours": 0.0298
+    },
+    "classification_report": {
+      "Low Risk": {
+        "precision": 0.7794823906083245,
+        "recall": 0.8167458764327649,
+        "f1-score": 0.797679180887372,
+        "support": 7154.0
+      },
+      "Moderate Risk": {
+        "precision": 0.7505759670183096,
+        "recall": 0.7232153288935623,
+        "f1-score": 0.7366416755920504,
+        "support": 8559.0
+      },
+      "High Risk": {
+        "precision": 0.757531712473573,
+        "recall": 0.7923980649619903,
+        "f1-score": 0.7745727217455921,
+        "support": 7235.0
+      },
+      "Very High Risk": {
+        "precision": 0.8632948506505406,
+        "recall": 0.8094501718213059,
+        "f1-score": 0.8355058969584109,
+        "support": 5820.0
+      },
+      "accuracy": 0.7813195216907676,
+      "macro avg": {
+        "precision": 0.7877212301876869,
+        "recall": 0.7854523605274057,
+        "f1-score": 0.7860998687958564,
+        "support": 28768.0
+      },
+      "weighted avg": {
+        "precision": 0.7823176687518809,
+        "recall": 0.7813195216907676,
+        "f1-score": 0.7813609192014713,
+        "support": 28768.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        5843,
+        1311,
+        0,
+        0
+      ],
+      [
+        1637,
+        6190,
+        732,
+        0
+      ],
+      [
+        16,
+        740,
+        5733,
+        746
+      ],
+      [
+        0,
+        6,
+        1103,
+        4711
+      ]
+    ]
+  },
+  "fitness_evaluation": {
+    "eval_accuracy": 0.81675,
+    "accuracy_ci95": [
+      0.808246875,
+      0.825253125
+    ],
+    "majority_baseline_accuracy": 0.27875,
+    "balanced_accuracy": 0.8066177263642154,
+    "macro_f1": 0.8066307586965005,
+    "weighted_f1": 0.8169818000273443,
+    "within_one_class_accuracy": 0.99975,
+    "quadratic_weighted_kappa": 0.93194726194813,
+    "log_loss": 0.444680492060654,
+    "expected_calibration_error": 0.06443528890398403,
+    "mean_confidence": 0.7523147110960159,
+    "total_samples": 8000,
+    "classes": [
+      "Beginner",
+      "Intermediate",
+      "Advanced",
+      "Athlete"
+    ],
+    "class_counts": {
+      "Beginner": 2199,
+      "Intermediate": 1729,
+      "Advanced": 1842,
+      "Athlete": 2230
+    },
+    "predicted_counts": {
+      "Beginner": 2251,
+      "Intermediate": 1644,
+      "Advanced": 1970,
+      "Athlete": 2135
+    },
+    "precision_per_class": {
+      "Beginner": 0.8867170146601511,
+      "Intermediate": 0.7086374695863747,
+      "Advanced": 0.7116751269035533,
+      "Athlete": 0.9231850117096019
+    },
+    "recall_per_class": {
+      "Beginner": 0.9076853115052297,
+      "Intermediate": 0.6737998843262001,
+      "Advanced": 0.761129207383279,
+      "Athlete": 0.8838565022421525
+    },
+    "f1_per_class": {
+      "Beginner": 0.8970786516853932,
+      "Intermediate": 0.6907797213163356,
+      "Advanced": 0.7355718782791185,
+      "Athlete": 0.9030927835051547
+    },
+    "support_per_class": {
+      "Beginner": 2199.0,
+      "Intermediate": 1729.0,
+      "Advanced": 1842.0,
+      "Athlete": 2230.0
+    },
+    "classification_report": {
+      "Beginner": {
+        "precision": 0.8867170146601511,
+        "recall": 0.9076853115052297,
+        "f1-score": 0.8970786516853932,
+        "support": 2199.0
+      },
+      "Intermediate": {
+        "precision": 0.7086374695863747,
+        "recall": 0.6737998843262001,
+        "f1-score": 0.6907797213163356,
+        "support": 1729.0
+      },
+      "Advanced": {
+        "precision": 0.7116751269035533,
+        "recall": 0.761129207383279,
+        "f1-score": 0.7355718782791185,
+        "support": 1842.0
+      },
+      "Athlete": {
+        "precision": 0.9231850117096019,
+        "recall": 0.8838565022421525,
+        "f1-score": 0.9030927835051547,
+        "support": 2230.0
+      },
+      "accuracy": 0.81675,
+      "macro avg": {
+        "precision": 0.8075536557149202,
+        "recall": 0.8066177263642154,
+        "f1-score": 0.8066307586965005,
+        "support": 8000.0
+      },
+      "weighted avg": {
+        "precision": 0.8180916325026588,
+        "recall": 0.81675,
+        "f1-score": 0.8169818000273443,
+        "support": 8000.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        1996,
+        203,
+        0,
+        0
+      ],
+      [
+        254,
+        1165,
+        309,
+        1
+      ],
+      [
+        1,
+        276,
+        1402,
+        163
+      ],
+      [
+        0,
+        0,
+        259,
+        1971
+      ]
+    ],
+    "feature_columns": [
+      "Age",
+      "BMI",
+      "Weight_KG",
+      "Available_Hours_Per_Week",
+      "Gender",
+      "Fitness_Experience",
+      "Fitness_Goal"
+    ],
+    "model": "fitness_level"
+  },
+  "injury_evaluation": {
+    "eval_accuracy": 0.689625,
+    "accuracy_ci95": [
+      0.679371875,
+      0.699875
+    ],
+    "majority_baseline_accuracy": 0.3,
+    "balanced_accuracy": 0.7013541666666667,
+    "macro_f1": 0.6939956934150251,
+    "weighted_f1": 0.6871936429205359,
+    "within_one_class_accuracy": 0.997,
+    "quadratic_weighted_kappa": 0.86080390511784,
+    "log_loss": 0.7158431927265385,
+    "expected_calibration_error": 0.08628818619454248,
+    "mean_confidence": 0.7759131861945424,
+    "total_samples": 8000,
+    "classes": [
+      "Low Risk",
+      "Moderate Risk",
+      "High Risk",
+      "Very High Risk"
+    ],
+    "class_counts": {
+      "Low Risk": 2000,
+      "Moderate Risk": 2400,
+      "High Risk": 2000,
+      "Very High Risk": 1600
+    },
+    "predicted_counts": {
+      "Low Risk": 1579,
+      "Moderate Risk": 2294,
+      "High Risk": 2178,
+      "Very High Risk": 1949
+    },
+    "precision_per_class": {
+      "Low Risk": 0.7688410386320456,
+      "Moderate Risk": 0.6530078465562337,
+      "High Risk": 0.6570247933884298,
+      "Very High Risk": 0.7049769112365315
+    },
+    "recall_per_class": {
+      "Low Risk": 0.607,
+      "Moderate Risk": 0.6241666666666666,
+      "High Risk": 0.7155,
+      "Very High Risk": 0.85875
+    },
+    "f1_per_class": {
+      "Low Risk": 0.6784017882089969,
+      "Moderate Risk": 0.6382616105666808,
+      "High Risk": 0.685016754427956,
+      "Very High Risk": 0.7743026204564666
+    },
+    "support_per_class": {
+      "Low Risk": 2000.0,
+      "Moderate Risk": 2400.0,
+      "High Risk": 2000.0,
+      "Very High Risk": 1600.0
+    },
+    "classification_report": {
+      "Low Risk": {
+        "precision": 0.7688410386320456,
+        "recall": 0.607,
+        "f1-score": 0.6784017882089969,
+        "support": 2000.0
+      },
+      "Moderate Risk": {
+        "precision": 0.6530078465562337,
+        "recall": 0.6241666666666666,
+        "f1-score": 0.6382616105666808,
+        "support": 2400.0
+      },
+      "High Risk": {
+        "precision": 0.6570247933884298,
+        "recall": 0.7155,
+        "f1-score": 0.685016754427956,
+        "support": 2000.0
+      },
+      "Very High Risk": {
+        "precision": 0.7049769112365315,
+        "recall": 0.85875,
+        "f1-score": 0.7743026204564666,
+        "support": 1600.0
+      },
+      "accuracy": 0.689625,
+      "macro avg": {
+        "precision": 0.6959626474533102,
+        "recall": 0.7013541666666667,
+        "f1-score": 0.6939956934150251,
+        "support": 8000.0
+      },
+      "weighted avg": {
+        "precision": 0.6933641942192952,
+        "recall": 0.689625,
+        "f1-score": 0.6871936429205359,
+        "support": 8000.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        1214,
+        782,
+        4,
+        0
+      ],
+      [
+        365,
+        1498,
+        517,
+        20
+      ],
+      [
+        0,
+        14,
+        1431,
+        555
+      ],
+      [
+        0,
+        0,
+        226,
+        1374
+      ]
+    ],
+    "feature_columns": [
+      "Age",
+      "BMI",
+      "Gender",
+      "Fitness_Experience",
+      "Has_Health_Conditions",
+      "Previous_Injury",
+      "Training_Frequency_Hours"
+    ],
+    "model": "injury_risk"
+  }
+}

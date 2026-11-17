@@ -26,15 +26,6 @@ class FitnessScorerMLAgent:
         if hasattr(self.model, "n_jobs"):
             self.model.n_jobs = 1
 
-    def _get_hours_category(self, available_hours: float) -> str:
-        if available_hours < 3:
-            return "Minimal"
-        if available_hours < 6:
-            return "Moderate"
-        if available_hours < 10:
-            return "High"
-        return "Athletic"
-
     def _normalize_experience_label(self, raw_value: Any, years_active: Any) -> str:
         years = 0.0
         try:
@@ -65,6 +56,8 @@ class FitnessScorerMLAgent:
             user_profile.get("fitness_years_active"),
         )
 
+        # Only inputs the app really collects. The training data's Activity_Score is left out on
+        # purpose: it nearly encodes the label and the app has no way to measure it.
         features = {
             "Age": int(user_profile["age"]),
             "BMI": float(user_profile["bmi"]),
@@ -72,11 +65,7 @@ class FitnessScorerMLAgent:
             "Available_Hours_Per_Week": available_hours,
             "Gender": user_profile["gender"],
             "Fitness_Experience": experience_level,
-            "Age_Category": user_profile["age_category"],
             "Fitness_Goal": user_profile["fitness_goal"],
-            "BMI_Category": user_profile["bmi_category"],
-            "Hours_Category": self._get_hours_category(available_hours),
-            "Activity_Score": min(100, available_hours * 15),
         }
 
         encoded_values = []
@@ -94,11 +83,14 @@ class FitnessScorerMLAgent:
 
         x = np.array(encoded_values, dtype=float).reshape(1, -1)
         x_scaled = self.scaler.transform(x)
-        prediction = self.model.predict(x_scaled)[0]
         probs = self.model.predict_proba(x_scaled)[0]
+        prediction = self.model.classes_[int(np.argmax(probs))]
 
+        # The model predicts the LabelEncoder's alphabetical index (Advanced, Athlete, Beginner,
+        # Intermediate), not the ordinal order, so decode with the saved encoder.
+        label = str(self.encoder["target_encoder"].inverse_transform([int(prediction)])[0])
         return {
-            "fitness_level_score": float(prediction),
-            "fitness_level_class": self.CLASS_NAMES[int(prediction)],
+            "fitness_level_score": float(self.CLASS_NAMES.index(label)),
+            "fitness_level_class": label,
             "fitness_confidence": float(np.max(probs) * 100),
         }
