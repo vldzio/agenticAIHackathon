@@ -131,6 +131,11 @@ def display_overview_tab(assessment):
         st.metric("Injury Risk", assessment.get("injury_risk_class", "Unknown"), f"{assessment.get('injury_confidence', 0):.2f}% confidence")
     with col3:
         st.metric("BMI", assessment.get("bmi", "N/A"))
+    st.caption(
+        "Fitness level and injury risk come from models trained on a synthetic dataset whose labels lean "
+        "mostly on age, BMI and weekly hours, not on stated experience. A young, lean self-described beginner "
+        "can therefore be classed Advanced. Treat both as rough estimates, not a coach's judgement."
+    )
 
     st.subheader("Personal Info")
     st.write(f"Name: {assessment.get('user_name') or 'N/A'}")

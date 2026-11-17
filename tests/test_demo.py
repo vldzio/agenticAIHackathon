@@ -144,6 +144,7 @@ def test_free_mode_runs_real_workflow_through_the_gateway(gateway):
     # real ML classifiers ran in the workflow
     metrics = {m.label: m.value for m in at.metric}
     assert metrics["Fitness Level"] != "Unknown" and metrics["Injury Risk"] != "Unknown"
+    assert any("synthetic dataset" in c.value for c in at.caption)  # the UI states the model's limitation
 
 
 def test_free_mode_is_rate_limited_but_byo_key_is_not(gateway, monkeypatch):

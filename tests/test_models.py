@@ -92,6 +92,29 @@ def test_fitness_labels_follow_the_inputs(fitness):
     assert (high["fitness_level_class"], high["fitness_level_score"]) == ("Athlete", 3.0)
 
 
+def test_fitness_node_passes_the_normalised_answers_unchanged(monkeypatch):
+    from nodes.fitness_scorer_node import fitness_scorer_node
+
+    seen = {}
+    monkeypatch.setattr(FitnessScorerMLAgent, "predict_fitness_level",
+                        lambda self, profile: seen.update(profile) or {"fitness_level_class": "Beginner"})
+    fitness_scorer_node({
+        "age": 30, "bmi": 24.22, "weight_kg": 70, "gender": "Male", "fitness_goal": "Weight Loss",
+        "normalized_fitness_experience": {"experience_level": "Beginner", "years_active": 0},
+        "normalized_schedule": {"estimated_hours_per_week": 4.5},
+    })
+    assert (seen["fitness_experience_level"], seen["fitness_years_active"], seen["available_hours_per_week"]) == ("Beginner", 0, 4.5)
+
+
+def test_young_lean_beginner_is_labelled_advanced_in_the_data_itself():
+    """Documents the README limitation: the default profile's 'Advanced' comes from the labels, not a bug."""
+    df = pd.read_csv(ROOT / "data" / "processed" / "fitness_level_training_cleaned.csv")
+    near = df[(df.Fitness_Experience == "Beginner") & df.Available_Hours_Per_Week.between(3.5, 5.5)
+              & df.Age.between(25, 35) & df.BMI.between(22.5, 26)]
+    share = near.Fitness_Level_Class.value_counts(normalize=True)
+    assert len(near) > 100 and share["Advanced"] > 0.5 > share.get("Beginner", 0) * 5
+
+
 def test_injury_risk_follows_the_health_answers(injury):
     base = {"age": 30, "bmi": 24, "gender": "Male", "fitness_experience_level": "Some Experience", "available_hours_per_week": 5}
     score = lambda **extra: injury.predict_injury_risk({**base, **extra})["injury_risk_score"]  # noqa: E731
