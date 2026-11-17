@@ -13,11 +13,11 @@ def injury_assessor_node(state: FitnessAssessmentState, client=None) -> Dict[str
                 "age": state.get("age"),
                 "bmi": state.get("bmi"),
                 "health_conditions": state.get("health_conditions"),
+                "normalized_health_conditions": state.get("normalized_health_conditions"),
                 "gender": state.get("gender"),
                 "fitness_goal": state.get("fitness_goal"),
                 "age_category": state.get("age_category"),
                 "bmi_category": state.get("bmi_category"),
-                "fitness_level_class": state.get("fitness_level_class", "Beginner"),
             }
         )
         experience_level = state.get("normalized_fitness_experience", {}).get("experience_level")

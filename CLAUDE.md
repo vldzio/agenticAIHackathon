@@ -11,15 +11,17 @@ Hugging Face Docker Space (public :7860 Streamlit `main.py`) -> private FreeLLMA
 ## Layout
 - `main.py` - UI and modes (`MODE_*`), gateway start (`_start_gateway`), per-IP admission via `utils/demo_guard.py` (4 credits per assessment). `main.py` uses CRLF; keep it.
 - `utils/openai_compat_client.py` - OpenAI-compatible client with `GeminiClient`'s interface (`generate_structured_json`, one corrective retry, LangSmith-wrapped). `utils/gateway.py` reads the gateway's unified key from its local SQLite DB. `utils/gemini_client.py` is original (its mock payloads are used only by tests and `ENABLE_MOCK`).
-- `workflow/`, `nodes/`, `agents/`, `ml/` - original LangGraph pipeline and models (`ml/models/*.pkl`). `deploy/space/` - Dockerfile, start.sh, README.
+- `workflow/`, `nodes/`, `agents/` - LangGraph pipeline. `ml/` - cleaning, training (`ml/train_model/common.py`), evaluation and models (`ml/models/*.pkl`); `python ml/train_pipeline.py` retrains both models and records `ml/models/metrics.json`.
+- `deploy/render/` + `render.yaml` - Render web service (the chosen host, not yet built). `deploy/space/` - earlier Hugging Face Space files.
 
 ## Run and test
-- `python -m venv .venv && .venv\Scripts\pip install -r requirements.txt && .venv\Scripts\pytest tests/test_demo.py` (8 tests drive the real Streamlit app via `AppTest`, the real workflow and ML models; only the LLM HTTP endpoint is stubbed).
+- `python -m venv .venv && .venv\Scripts\pip install -r requirements.txt && .venv\Scripts\pytest tests` (14 tests: `test_demo.py` drives the real Streamlit app via `AppTest` with the real workflow and ML models, only the LLM HTTP endpoint is stubbed; `test_models.py` checks the classifiers on the evaluation CSVs). Needs Python 3.11+ (scikit-learn 1.8.0 has no 3.10 build).
 - Local run: `streamlit run main.py` (set `LLM_BASE_URL`/`LLM_API_KEY` for Free mode, or use BYO key modes).
 
 ## Rules and gotchas
 - `requirements.txt` pins `scikit-learn==1.8.0` (the pickles were saved with it) and `pyarrow==18.1.0` (newer pyarrow needs NumPy 2, which langchain 0.3 forbids; without the pin the app crashed at import in testing).
-- The hosted app must not offer simulated output: Mock mode stays behind `ENABLE_MOCK=1`. Client IP = LAST `X-Forwarded-For` entry. Never log API keys.
+- The ML models may only use inputs the form collects (no `Activity_Score`, flexibility, strength-imbalance, overtraining or `Fitness_Level` columns); `test_models.py` enforces it. Model classes are in LabelEncoder (alphabetical) order, so always decode with the saved encoder. The injury evaluation set is labelled on a shifted scale, which caps exact accuracy near 70% (see README).
+- The hosted app must not offer simulated output: Mock mode stays behind `ENABLE_MOCK=1`. Client IP = `CF-Connecting-IP` (Render sits behind Cloudflare), else the LAST `X-Forwarded-For` entry. Never log API keys.
 - LangSmith: set `LANGSMITH_API_KEY` and `start.sh` turns tracing on; project `aetherfit-demo`.
 
 ## Deploy facts
@@ -27,4 +29,4 @@ Hugging Face Docker Space (public :7860 Streamlit `main.py`) -> private FreeLLMA
 - Steps: `hf auth login`, create the Space from `deploy/space/` (Docker SDK), set the secrets, wait for the build, open the Space URL.
 
 ## Status
-Verified: 8 tests pass (real workflow, real ML models). NOT verified: Space Docker build, real provider calls, Streamlit behind the Spaces iframe/proxy (start.sh disables CORS/XSRF checks for it), live LangSmith traces.
+Verified: 14 tests pass (real workflow, real ML models); held-out accuracy 81.7% fitness and 69.0% injury (`ml/models/metrics.json`); local run through a live FreeLLMAPI gateway. NOT verified: Render Docker build, the limiter against a real Upstash database, Space Docker build, real provider calls, Streamlit behind the Spaces iframe/proxy (start.sh disables CORS/XSRF checks for it), live LangSmith traces.

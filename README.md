@@ -7,10 +7,10 @@ AetherFit supports two generation modes: a **no-key Mock Demo** for exploring th
 ## What it does
 
 - Collects age, height, weight, fitness goal, experience, available training time, and health conditions in a Streamlit sidebar.
-- Loads trained Random Forest models to classify fitness level and injury risk, including class probabilities and surfaced risk factors.
+- Loads trained gradient-boosted classifiers to estimate fitness level and injury risk from the answers on the form, including class probabilities and surfaced risk factors.
 - Uses LangGraph to coordinate input normalization, classification, workout planning, nutrition guidance, and recovery recommendations.
 - Presents results across **Overview**, **Workout**, **Nutrition**, and **Recovery** tabs; supports JSON export.
-- Exposes a **Run Model Evaluation** action that reports evaluation accuracy and confusion matrices for both classifiers using the repository's evaluation datasets.
+- Exposes a **Run Model Evaluation** action that scores both classifiers on the repository's held-out evaluation datasets: accuracy with a confidence interval, macro F1, ordinal metrics, calibration, per-class precision and recall, and confusion matrices.
 
 ```text
 Profile form
@@ -56,9 +56,31 @@ Then open `http://localhost:8501`. The container defaults to Mock Demo; visitors
 
 - `ml/models/` contains serialized fitness-level and injury-risk classifiers, scalers, and encoders used by the app.
 - `data/training_dataset/` and `data/processed/` contain training inputs and cleaned datasets; `data/evaluation_dataset/` contains separate evaluation CSVs.
-- `ml/train_model/` and `ml/data_cleaning/` contain training/preprocessing code; `ml/evaluation/evaluate_models.py` computes accuracy, per-class precision/recall/F1, and confusion matrices.
+- `ml/train_model/` and `ml/data_cleaning/` contain training/preprocessing code; `ml/evaluation/evaluate_models.py` computes the metrics below.
+- `python ml/train_pipeline.py` cleans the data, retrains both models, evaluates them and records the run in `ml/models/metrics.json`.
 
-Click **Run Model Evaluation** in the Streamlit UI to inspect the metrics on the bundled evaluation CSVs. This README does not claim a particular score without a recorded run and documented data provenance. **If retraining**, note that `ml/train_pipeline.py` currently points its evaluation files at `data/` rather than `data/evaluation_dataset/`; correct `eval_dir` before using that orchestrator. Only load serialized `.pkl` model files from sources you trust.
+### Recorded results
+
+Both models are trained on `data/training_dataset/` only and scored once on the 8,000 separate rows in `data/evaluation_dataset/`. The datasets are synthetic, so these numbers describe how well the models reproduce the datasets' labelling rules, not real-world medical or coaching accuracy.
+
+| Metric (held-out evaluation set) | Fitness level | Injury risk |
+| --- | --- | --- |
+| Accuracy (95% bootstrap interval) | 81.7% (80.8 to 82.5) | 69.0% (67.9 to 70.0) |
+| Majority-class baseline | 27.9% | 30.0% |
+| Macro F1 | 0.807 | 0.694 |
+| Within one class of the true label | 100.0% | 99.7% |
+| Quadratic weighted kappa | 0.932 | 0.861 |
+| Expected calibration error | 0.064 | 0.086 |
+| 5-fold cross-validation accuracy on training data | 76.0% | 78.1% |
+
+Things to know when reading them:
+
+- **The models only use what the form collects.** The fitness model does not use the dataset's `Activity_Score` column, and the injury model does not use `Flexibility_Score`, `Strength_Imbalance_Score`, `Overtraining_Risk_Score` or `Fitness_Level`. An earlier version scored 98% and 75% offline with those columns, but the app cannot measure them and fed the models invented values, so the predictions users saw were far less accurate than the report claimed.
+- **Injury risk: the evaluation set is labelled on a shifted scale.** Each dataset assigns its four risk classes by rank within that dataset (exactly 25/30/25/20%), and the evaluation population is older and heavier, so the same person tends to get a lower class there than in the training data. The model ranks people well (kappa 0.86, almost never more than one class off) but its fixed class boundaries come from the training data, which caps exact-match accuracy on this set.
+- **Fitness level: training rows are noisier than evaluation rows** (missing values), which is why cross-validation accuracy is lower than evaluation accuracy.
+- The fitness labels in the data lean heavily on age and BMI, so a young, lean person can be classed "Advanced" on few weekly hours. That is a property of the dataset.
+
+Click **Run Model Evaluation** in the Streamlit UI to recompute these metrics from the bundled evaluation CSVs. Only load serialized `.pkl` model files from sources you trust.
 
 ## Repository map
 

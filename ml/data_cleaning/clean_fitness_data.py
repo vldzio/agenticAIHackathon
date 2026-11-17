@@ -3,39 +3,34 @@
 import pandas as pd
 from pathlib import Path
 
+VALID_VALUES = {
+  "Gender": ["Male", "Female", "Other"],
+  "Fitness_Goal": ["Weight Loss", "Muscle Building", "Endurance/Cardio", "General Fitness"],
+  "Fitness_Experience": ["Never Exercised", "Beginner", "Some Experience", "Advanced"],
+  "Fitness_Level_Class": ["Beginner", "Intermediate", "Advanced", "Athlete"],
+}
+NUMERIC_COLS = ["Age", "Height_CM", "Weight_KG", "BMI", "Available_Hours_Per_Week", "Activity_Score"]
+
 
 def clean_fitness_data(input_path: str, output_path: str = None) -> pd.DataFrame:
   df = pd.read_csv(input_path)
   df = df.drop_duplicates(subset=["User_ID"], keep="first")
 
-  numeric_cols = [
-    "Age",
-    "Height_CM",
-    "Weight_KG",
-    "BMI",
-    "Available_Hours_Per_Week",
-    "Activity_Score"
-  ]
-  for col in numeric_cols:
+  for col in NUMERIC_COLS:
     df[col] = pd.to_numeric(df[col], errors="coerce")
-    df[col].fillna(df[col].median(), inplace=True)
 
-  for col in numeric_cols:
+  # Rows with a missing or unknown category or label cannot be repaired, so drop them.
+  for col, valid in VALID_VALUES.items():
+    df = df[df[col].isin(valid)]
 
-    Q1 = df[col].quantile(0.25)
-    Q3 = df[col].quantile(0.75)
-    IQR = Q3 - Q1
-    lower = Q1 - 1.5 * IQR
-    upper = Q3 + 1.5 * IQR
-    df = df[(df[col] >= lower) & (df[col] <= upper)]
+  # BMI and weight follow from each other and height, so recover them exactly.
+  height_m = df["Height_CM"] / 100
+  df["BMI"] = df["BMI"].fillna((df["Weight_KG"] / height_m**2).round(1))
+  df["Weight_KG"] = df["Weight_KG"].fillna((df["BMI"] * height_m**2).round(1))
 
-  valid_gender = ["Male", "Female", "Other"]
-  valid_fitness_class = ["Beginner", "Intermediate", "Advanced", "Athlete"]
-  valid_experience = ["Never Exercised", "Beginner", "Some Experience", "Advanced"]
-
-  df = df[df["Gender"].isin(valid_gender)]
-  df = df[df["Fitness_Level_Class"].isin(valid_fitness_class)]
-  df = df[df["Fitness_Experience"].isin(valid_experience)]
+  # Other numeric gaps stay empty: the classifier handles missing values itself.
+  # No outlier filter: every value in the raw file is inside its valid range, and
+  # the old IQR rule threw away everyone training more than about 13 hours a week.
 
   df.reset_index(drop=True, inplace=True)
 

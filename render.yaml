@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: aetherfit-ai
+    runtime: docker
+    dockerfilePath: ./deploy/render/Dockerfile
+    dockerContext: ./deploy/render
+    plan: free
+    healthCheckPath: /_stcore/health
+    envVars:
+      - { key: ENCRYPTION_KEY, sync: false }        # 64 hex chars
+      - { key: FREEAPI_CONFIG_JSON, sync: false }   # contents of workspace-demo.config.json
+      - { key: UPSTASH_REDIS_REST_URL, sync: false }
+      - { key: UPSTASH_REDIS_REST_TOKEN, sync: false }
+      - { key: LANGSMITH_API_KEY, sync: false }
+      - { key: RL_PER_IP_DAILY, value: "20" }       # 4 credits per assessment = 5/day per visitor
+      - { key: RL_GLOBAL_DAILY, value: "1000" }

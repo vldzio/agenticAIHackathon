@@ -1,0 +1,37 @@
+# Render Docker web service: private FreeLLMAPI gateway + the AetherFit Streamlit app in one container.
+#
+#   public :$PORT (Render)  ->  Streamlit app (per-IP/global limits, BYO key, LangSmith tracing)
+#   private :3001 ->  FreeLLMAPI (bound to 127.0.0.1, never exposed)
+#
+# The project code is cloned at build time, so the Space repo only needs this
+# Dockerfile + start.sh + README.md. Rebuild the Space to pick up new commits.
+FROM ghcr.io/tashfeenahmed/freellmapi:latest
+
+USER root
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 python3-venv git ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+ARG REPO=https://github.com/vldzio/agenticAIHackathon.git
+ARG REF=demo-ready
+ARG CACHEBUST=1
+# Bust Docker's cached clone layer whenever the branch gets new commits.
+ADD https://api.github.com/repos/vldzio/agenticAIHackathon/git/refs/heads/demo-ready /tmp/branch-head.json
+RUN git clone --depth 1 --branch "${REF}" "${REPO}" /srv/app \
+ && python3 -m venv /opt/venv \
+ && /opt/venv/bin/pip install --no-cache-dir -r /srv/app/requirements.txt \
+ && chown -R node:node /srv/app
+
+COPY start.sh /srv/start.sh
+RUN tr -d '\015' < /srv/start.sh > /tmp/start.sh && install -m 755 /tmp/start.sh /srv/start.sh && rm /tmp/start.sh
+
+USER node
+ENV HOME=/home/node \
+    FREEAPI_DB_PATH=/app/server/data/freeapi.db \
+    DEMO_PROJECT=aetherfit \
+    LANGSMITH_PROJECT=aetherfit-demo \
+    PYTHONUNBUFFERED=1
+EXPOSE 10000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||10000)+'/_stcore/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+CMD ["/srv/start.sh"]

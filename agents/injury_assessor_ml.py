@@ -1,12 +1,20 @@
 from pathlib import Path
 import pickle
+import re
 from typing import Any, Dict
 
 import numpy as np
 
 
+RISK_ORDER = ["Low Risk", "Moderate Risk", "High Risk", "Very High Risk"]
+NOTHING_REPORTED = re.compile(r"^(no|none|nil|nothing|n/?a|not applicable|healthy)\b")
+INJURY_WORDS = re.compile(
+    r"injur|surger|operat|sprain|strain|tear|torn|fractur|broke|dislocat|ruptur|herniat|slipped disc|\bacl\b|meniscus|tendon"
+)
+
+
 class InjuryAssessorMLAgent:
-    """Predicts injury risk using the trained RandomForest model."""
+    """Predicts injury risk from the trained classifier."""
 
     def __init__(self, model_dir: str = "ml/models"):
         base_dir = Path(__file__).resolve().parent.parent
@@ -50,39 +58,6 @@ class InjuryAssessorMLAgent:
             return "Beginner"
         return "Beginner" if years > 0 else "Never Exercised"
 
-    def _age_category(self, age: int) -> str:
-        if age < 30:
-            return "Young Adult"
-        if age < 45:
-            return "Adult"
-        if age < 60:
-            return "Middle Aged"
-        return "Senior"
-
-    def _bmi_category(self, bmi: float) -> str:
-        if bmi < 18.5:
-            return "Underweight"
-        if bmi < 25:
-            return "Normal"
-        if bmi < 30:
-            return "Overweight"
-        return "Obese"
-
-    def _flexibility_score(self, experience: str) -> int:
-        mapping = {"Beginner": 40, "Intermediate": 60, "Advanced": 80, "Athlete": 90}
-        return mapping.get(experience, 50)
-
-    def _strength_imbalance(self, experience: str) -> int:
-        mapping = {"Beginner": 70, "Intermediate": 50, "Advanced": 30, "Athlete": 20}
-        return mapping.get(experience, 50)
-
-    def _training_frequency(self, hours: float) -> int:
-        if hours < 2:
-            return 1
-        if hours < 5:
-            return 3
-        return 5
-
     def _encode_features(self, features: Dict[str, Any]) -> np.ndarray:
         values = []
         for col in self.feature_columns:
@@ -96,6 +71,26 @@ class InjuryAssessorMLAgent:
                 value = 0
             values.append(value)
         return np.array(values, dtype=float).reshape(1, -1)
+
+    def _health_flags(self, user_profile: Dict[str, Any]) -> tuple[int, int]:
+        """Return (has_health_conditions, previous_injury), the model's two strongest inputs.
+
+        An injury alone sets only previous_injury, and an illness alone only
+        has_health_conditions, matching how the training data separates them. The
+        normalizer's condition list is used when present, otherwise the raw text.
+        """
+        normalized = user_profile.get("normalized_health_conditions") or {}
+        items = normalized.get("conditions", normalized.get("condtions"))  # the prompt spells the key "condtions"
+        if not isinstance(items, list):
+            text = str(user_profile.get("health_conditions") or "")
+            items = re.split(r"[,;.\n]|\band\b", text)
+        items = [str(item).strip().lower() for item in items]
+        items = [item for item in items if item and not NOTHING_REPORTED.match(item)]
+
+        injuries = [item for item in items if INJURY_WORDS.search(item)]
+        previous_injury = 1 if injuries or str(user_profile.get("injury_history") or "").strip() else 0
+        has_health_conditions = 1 if len(items) > len(injuries) else 0
+        return has_health_conditions, previous_injury
 
     def _compute_risk_factors(self, age: int, bmi: float, has_conditions: int, previous_injury: int) -> list[str]:
         factors = []
@@ -117,36 +112,29 @@ class InjuryAssessorMLAgent:
             user_profile.get("fitness_experience_level") or user_profile.get("fitness_experience"),
             user_profile.get("fitness_years_active"),
         )
-        fitness_level = user_profile.get("fitness_level_class", "Beginner")
         hours = float(user_profile.get("available_hours_per_week", 3))
-        health_conditions = str(user_profile.get("health_conditions", "") or "")
-        injury_history = str(user_profile.get("injury_history", "") or "")
+        has_health_conditions, previous_injury = self._health_flags(user_profile)
 
-        has_health_conditions = 1 if health_conditions and health_conditions.lower() not in {"none", "no", ""} else 0
-        previous_injury = 1 if injury_history or "injury" in health_conditions.lower() else 0
-
+        # Only inputs the app really collects (no flexibility or strength-imbalance measurements, and
+        # no fitness level: that model runs in parallel, so its result is not available here).
         features = {
             "Age": age,
             "BMI": bmi,
-            "Fitness_Level": fitness_level,
             "Gender": gender,
             "Fitness_Experience": experience,
-            "Age_Category": user_profile.get("age_category") or self._age_category(age),
-            "BMI_Category": user_profile.get("bmi_category") or self._bmi_category(bmi),
             "Has_Health_Conditions": has_health_conditions,
             "Previous_Injury": previous_injury,
-            "Flexibility_Score": self._flexibility_score(experience),
-            "Strength_Imbalance_Score": self._strength_imbalance(experience),
-            "Training_Frequency_Hours": self._training_frequency(hours),
+            "Training_Frequency_Hours": hours,
         }
 
         x_scaled = self.scaler.transform(self._encode_features(features))
-        prediction = self.model.predict(x_scaled)[0]
         probs = self.model.predict_proba(x_scaled)[0]
+        prediction = self.model.classes_[int(np.argmax(probs))]
+        label = str(self.label_encoder.inverse_transform([prediction])[0])
 
         return {
-            "injury_risk_score": int(prediction),
-            "injury_risk_class": self.label_encoder.inverse_transform([prediction])[0],
+            "injury_risk_score": RISK_ORDER.index(label),
+            "injury_risk_class": label,
             "injury_confidence": float(np.max(probs) * 100),
             "injury_risk_factors": self._compute_risk_factors(age, bmi, has_health_conditions, previous_injury),
         }

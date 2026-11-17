@@ -3,6 +3,7 @@ import os
 import threading
 from datetime import datetime, timezone
 
+import pandas as pd
 import streamlit as st
 
 from graph import assess_fitness
@@ -34,6 +35,9 @@ def _start_gateway() -> bool:
 
 def _client_ip() -> str:
     try:
+        cf = st.context.headers.get("CF-Connecting-IP", "")  # Render sits behind Cloudflare; the last XFF hop is internal
+        if cf:
+            return cf.strip()
         fwd = st.context.headers.get("X-Forwarded-For", "")
         if fwd:
             return fwd.split(",")[-1].strip()  # the proxy appends the real client IP last; earlier entries are spoofable
@@ -228,9 +232,31 @@ def display_model_evaluation_section(eval_results):
         if "error" in result:
             st.error(f"{label} evaluation error: {result['error']}")
             continue
-        st.write(f"{label} Model Accuracy:", result.get("eval_accuracy"))
-        st.write(f"{label} Confusion Matrix")
-        st.write(result.get("confusion_matrix"))
+        classes = result["classes"]
+        low, high = result["accuracy_ci95"]
+        st.markdown(f"**{label} model** on {result['total_samples']} held-out evaluation rows")
+        cols = st.columns(4)
+        cols[0].metric("Accuracy", f"{result['eval_accuracy']:.1%}", f"95% CI {low:.1%} to {high:.1%}", delta_color="off")
+        cols[1].metric("Macro F1", f"{result['macro_f1']:.3f}")
+        cols[2].metric("Within one class", f"{result['within_one_class_accuracy']:.1%}")
+        cols[3].metric("Weighted kappa", f"{result['quadratic_weighted_kappa']:.3f}")
+        st.caption(
+            f"Always guessing the largest class would score {result['majority_baseline_accuracy']:.1%}. "
+            f"Calibration error {result['expected_calibration_error']:.3f}, log loss {result['log_loss']:.3f}. "
+            "The model uses only inputs this form collects."
+        )
+        st.dataframe(
+            pd.DataFrame(
+                {
+                    "Precision": result["precision_per_class"],
+                    "Recall": result["recall_per_class"],
+                    "F1": result["f1_per_class"],
+                    "Rows": result["support_per_class"],
+                }
+            ).round(3)
+        )
+        st.write("Confusion matrix (rows are the true class, columns the predicted class)")
+        st.dataframe(pd.DataFrame(result["confusion_matrix"], index=classes, columns=classes))
 
 
 def main():

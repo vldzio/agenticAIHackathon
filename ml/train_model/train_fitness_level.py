@@ -1,122 +1,37 @@
-"""Train fitness level classifier using RandomForest."""
+"""Train the fitness level classifier."""
 
-import pandas as pd
-import numpy as np
-import pickle
-from pathlib import Path
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from ml.train_model.common import train_classifier
+
+# Only what the app collects from the user. Activity_Score is excluded on purpose:
+# its ranges barely overlap between classes (it nearly encodes the label) and the
+# app cannot measure it, so a model that leans on it scores well offline and
+# poorly in the app. The *_Category columns are dropped because they are derived
+# from Age, BMI and hours, which the model already sees.
+FEATURE_COLUMNS = [
+    "Age",
+    "BMI",
+    "Weight_KG",
+    "Available_Hours_Per_Week",
+    "Gender",
+    "Fitness_Experience",
+    "Fitness_Goal",
+]
+CATEGORICAL_FEATURES = ["Gender", "Fitness_Experience", "Fitness_Goal"]
+TARGET_COLUMN = "Fitness_Level_Class"
 
 
-def train_fitness_level_model(training_data_path: str,
+def train_fitness_level_model(
+    training_data_path: str,
     model_output_path: str,
     scaler_output_path: str,
-    encoder_output_path: str) -> dict:
-
-    df = pd.read_csv(training_data_path)
-    feature_columns = [
-        "Age",
-        "BMI",
-        "Weight_KG",
-        "Available_Hours_Per_Week",
-        "Gender",
-        "Fitness_Experience",
-        "Age_Category",
-        "Fitness_Goal",
-        "BMI_Category",
-        "Hours_Category",
-        "Activity_Score"
-    ]
-
-    target_column = "Fitness_Level_Class"
-
-    x = df[feature_columns].copy()
-    y = df[target_column].copy()
-
-    categorical_features = [
-        "Gender",
-        "Fitness_Experience",
-        "Age_Category",
-        "Fitness_Goal",
-        "BMI_Category",
-        "Hours_Category"
-    ]
-
-    feature_encoders = {}
-
-    for col in categorical_features:
-        encoder = LabelEncoder()
-        x[col] = encoder.fit_transform(x[col])
-        feature_encoders[col] = encoder
-
-    target_encoder = LabelEncoder()
-    y = target_encoder.fit_transform(y)
-
-    x_train, x_test, y_train, y_test = train_test_split(
-        x, y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y
+    encoder_output_path: str,
+) -> dict:
+    return train_classifier(
+        training_data_path,
+        FEATURE_COLUMNS,
+        CATEGORICAL_FEATURES,
+        TARGET_COLUMN,
+        model_output_path,
+        scaler_output_path,
+        encoder_output_path,
     )
-
-    scaler = StandardScaler()
-
-    x_train_scaled = scaler.fit_transform(x_train)
-    x_test_scaled = scaler.transform(x_test)
-
-    model = RandomForestClassifier(
-        n_estimators = 100,
-        max_depth = 10,
-        min_samples_split=5,
-        min_samples_leaf=2,
-        class_weight="balanced",
-        n_jobs=-1,
-        random_state=42,
-        max_features=1000
-    )
-
-    model.fit(x_train_scaled, y_train)
-
-    predictions = model.predict(x_test_scaled)
-
-    accuracy = accuracy_score(y_test, predictions)
-
-    report = classification_report(
-        y_test,
-        predictions,
-        output_dict=True
-    )
-
-    cm = confusion_matrix(y_test, predictions)
-
-    Path(model_output_path).parent.mkdir(parents=True, exist_ok=True)
-
-    with open(model_output_path, "wb") as f:
-        pickle.dump(model, f)
-
-    with open(scaler_output_path, "wb") as f:
-        pickle.dump(scaler, f)
-
-    encoder_data = {
-        "target_encoder":target_encoder,
-        "feature_encoders": feature_encoders,
-        "feature_columns": feature_columns
-    }
-
-    with open(encoder_output_path, "wb") as f:
-        pickle.dump(encoder_data, f)
-
-    feature_importance = dict(zip(feature_columns, model.feature_importances_))
-
-    return {
-        "model_accuracy" : accuracy,
-        "total_samples" : len(df),
-        "train_samples" : len(x_train),
-        "test_samples" : len(x_test),
-        "classes": list(target_encoder.classes_),
-        "feature_importance": feature_importance,
-        "classification_report": report,
-        "confusion_matrix": cm.tolist()
-    }
