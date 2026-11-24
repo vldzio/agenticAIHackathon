@@ -35,7 +35,7 @@ def run_training_pipeline(project_root: str = None) -> dict:
         data_dir = project_root / "data"
         training_dir = data_dir / "training_dataset"
         processed_dir = data_dir / "processed"
-        eval_dir = data_dir
+        eval_dir = data_dir / "evaluation_dataset"
 
         models_dir = project_root / "ml" / "models"
         models_dir.mkdir(parents=True, exist_ok=True)
