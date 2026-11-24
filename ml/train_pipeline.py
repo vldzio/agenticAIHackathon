@@ -1,5 +1,6 @@
 """Master orchestrator for ML training pipeline."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -89,13 +90,17 @@ def run_training_pipeline(project_root: str = None) -> dict:
             str(injury_encoder),
         )
 
-        return {
+        results = {
             "pipeline_status": "success",
             "fitness_training" : fitness_training,
             "injury_training" : injury_training,
             "fitness_evaluation" : fitness_evaluation,
             "injury_evaluation" : injury_evaluation,
         }
+        # Recorded run: the numbers quoted in the README come from this file.
+        with open(models_dir / "metrics.json", "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=2)
+        return results
     except Exception as e:
         return {
             "pipeline_status": "failed",
@@ -107,4 +112,13 @@ if __name__ == "__main__":
     # Run from AetherFit root directory
     project_root = str(Path(__file__).parent.parent)
     results = run_training_pipeline(project_root)
-    sys.exit(0 if results['pipeline_status'] == 'success' else 1)
+    if results["pipeline_status"] != "success":
+        print("Pipeline failed:", results["error"])
+        sys.exit(1)
+    for name in ("fitness", "injury"):
+        cv, ev = results[f"{name}_training"]["cv_metrics"], results[f"{name}_evaluation"]
+        print(
+            f"{name}: cross-validation accuracy {cv['eval_accuracy']:.3f} | evaluation accuracy {ev['eval_accuracy']:.3f} "
+            f"(95% CI {ev['accuracy_ci95'][0]:.3f}-{ev['accuracy_ci95'][1]:.3f}), macro F1 {ev['macro_f1']:.3f}, "
+            f"within one class {ev['within_one_class_accuracy']:.3f}, weighted kappa {ev['quadratic_weighted_kappa']:.3f}"
+        )
